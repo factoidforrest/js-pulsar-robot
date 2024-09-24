@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package topics;
+
+message hello_world { string message = 1; }
+
+message leak_sensor { bool is_leaking = 1; }

@@ -1,0 +1,6 @@
+{
+  "name": "hello-world-node",
+  "rate": 1,
+  "pulsarUrl": "pulsar://localhost:6650",
+  "topic": "hello-world-topic"
+}
