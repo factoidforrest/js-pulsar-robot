@@ -6,29 +6,14 @@ message hello_world { string message = 1; }
 
 message leak_sensor { bool is_leaking = 1; }
 
-// message imu_data {
-//   message Vector3 {
-//     double x = 1;
-//     double y = 2;
-//     double z = 3;
-//   }
-
-//   message Quaternion {
-//     double x = 1;
-//     double y = 2;
-//     double z = 3;
-//     double w = 4;
-//   }
-
-//   uint64 timestamp = 1;
-//   Quaternion orientation = 2;
-//   Vector3 angular_velocity = 3;
-//   Vector3 linear_acceleration = 4;
-//   Vector3 magnetic_field = 5;
-//   double temperature = 6;
-// }
-
 message imuData {
+  message CalibrationStatus {
+    uint32 sys = 1;
+    uint32 gyro = 2;
+    uint32 accel = 3;
+    uint32 mag = 4;
+  }
+
   Vector3 acceleration = 2;
   Vector3 magnetometer = 3;
   Vector3 gyroscope = 4;
@@ -36,7 +21,7 @@ message imuData {
   Vector3 linearAcceleration = 6;
   Vector3 gravity = 7;
   double temperature = 8;
-  uint32 calibrationStatus = 9;
+  CalibrationStatus calibrationStatus = 9;
 }
 
 message Vector3 {
@@ -50,4 +35,17 @@ message Quaternion {
   double y = 2;
   double z = 3;
   double w = 4;
+}
+
+message gpsData {
+  double timestamp = 1;
+  double latitude = 2;
+  double longitude = 3;
+  double altitude = 4;
+  double speed = 5;
+  double course = 6;
+  int32 satellites = 7;
+  double hdop = 8;
+  string fix = 9;
+  string linkQuality = 10;
 }

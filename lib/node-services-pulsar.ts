@@ -1,12 +1,17 @@
-import { connect, NatsConnection, Subscription, StringCodec } from 'nats';
-import { MessageFns } from '../topics/generated/topics/topics';
+import {
+  connect,
+  type NatsConnection,
+  type Subscription,
+  StringCodec,
+} from 'nats';
+import {type MessageFns} from '../topics/generated/topics/topics.js';
 
-export interface NodeConfig {
+export type NodeConfig = {
   servers?: string | string[];
   rate: number;
   name: string;
   // Add other configuration options as needed
-}
+};
 
 export class Node {
   private connection: NatsConnection;
@@ -20,11 +25,23 @@ export class Node {
     });
   }
 
-  async createTopicProducer<T>(topicName: string, messageFns: MessageFns<T>): Promise<TopicProducer<T>> {
-    return new TopicProducer<T>(this.connection, messageFns, topicName, this.config.name);
+  async createTopicProducer<T>(
+    topicName: string,
+    messageFns: MessageFns<T>,
+  ): Promise<TopicProducer<T>> {
+    return new TopicProducer<T>(
+      this.connection,
+      messageFns,
+      topicName,
+      this.config.name,
+    );
   }
 
-  async createTopicConsumer<T>(topicName: string, messageFns: MessageFns<T>, subscription: string): Promise<TopicConsumer<T>> {
+  async createTopicConsumer<T>(
+    topicName: string,
+    messageFns: MessageFns<T>,
+    subscription: string,
+  ): Promise<TopicConsumer<T>> {
     const consumer = this.connection.subscribe(topicName, {
       queue: `${this.config.name}-${subscription}`,
     });
@@ -38,7 +55,7 @@ export class Node {
       await loopFunction();
       const elapsedTime = Date.now() - startTime;
       const sleepTime = Math.max(0, intervalMs - elapsedTime);
-      await new Promise(resolve => setTimeout(resolve, sleepTime));
+      await new Promise((resolve) => setTimeout(resolve, sleepTime));
     }
   }
 
@@ -48,19 +65,21 @@ export class Node {
 }
 
 export class TopicProducer<T> {
-  private sc = StringCodec();
+  private readonly sc = StringCodec();
 
   constructor(
-    private connection: NatsConnection,
-    private messageFns: MessageFns<T>,
-    private topicName: string,
-    private nodeName: string
+    private readonly connection: NatsConnection,
+    private readonly messageFns: MessageFns<T>,
+    private readonly topicName: string,
+    private readonly nodeName: string,
   ) {}
 
   async sendMsg(message: T): Promise<void> {
-    const rawMsg = this.messageFns.encode(message).finish();
-    const encodedMsg = this.sc.encode(Buffer.from(rawMsg).toString('base64'));
-    this.connection.publish(this.topicName, encodedMsg);
+    const rawMessage = this.messageFns.encode(message).finish();
+    const encodedMessage = this.sc.encode(
+      Buffer.from(rawMessage).toString('base64'),
+    );
+    this.connection.publish(this.topicName, encodedMessage);
     console.log('Message sent:', message);
   }
 
@@ -70,18 +89,22 @@ export class TopicProducer<T> {
 }
 
 export class TopicConsumer<T> {
-  private sc = StringCodec();
+  private readonly sc = StringCodec();
 
-  constructor(private consumer: Subscription, private messageFns: MessageFns<T>) {}
+  constructor(
+    private readonly consumer: Subscription,
+    private readonly messageFns: MessageFns<T>,
+  ) {}
 
   async receiveMsg(): Promise<T> {
-    const msg = await this.consumer.next();
-    if (!msg) {
+    const message = await this.consumer.next();
+    if (!message) {
       throw new Error('No message received');
     }
-    const decodedData = Buffer.from(this.sc.decode(msg.data), 'base64');
-    const decodedMsg = this.messageFns.decode(decodedData);
-    return decodedMsg;
+
+    const decodedData = Buffer.from(this.sc.decode(message.data), 'base64');
+    const decodedMessage = this.messageFns.decode(decodedData);
+    return decodedMessage;
   }
 
   async close(): Promise<void> {
