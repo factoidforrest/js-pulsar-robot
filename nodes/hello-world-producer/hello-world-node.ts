@@ -5,8 +5,8 @@ import { helloWorld } from '../../topics/generated/topics/topics';
 
 async function main() {
   console.log('initializing node')
-  const node = new Node({rate:1});
-  const topic = await node.createTopicProducer("hello_world", helloWorld);
+  const node = await Node.create({rate:1, name:"hello-world-producer"});
+  const topic = await node.createTopicPublisher("hello_world", helloWorld);
   console.log('created topic')
 
   await node.loop(async () => {

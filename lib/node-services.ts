@@ -1,52 +1,43 @@
-import * as Pulsar from 'pulsar-client';
+import * as Nats from 'nats';
 import { MessageFns } from '../topics/generated/topics/topics';
+import EventEmitter from 'events';
 
 export interface NodeConfig {
-  serviceUrl?: string;
+  natsServers?: string | string[];
   rate: number;
-  name:string
+  name: string;
   // Add other configuration options as needed
 }
 
 export class Node {
-
-  private client: Pulsar.Client;
+  private client!: Nats.NatsConnection;
 
   constructor(public config: NodeConfig) {
-    this.client = new Pulsar.Client({
-      serviceUrl: config.serviceUrl || 'pulsar://localhost:6650',
-      // Add other client configuration options as needed
+    // Initialization logic without async
+  }
+
+  // THIS IS OUR PUBLIC METHOD HERE
+  static async create(config: NodeConfig): Promise<Node> {
+    const instance = new this(config);
+    await instance.connect();
+    return instance;
+  }
+
+  async connect(): Promise<void> {
+    this.client = await Nats.connect({
+      servers: this.config.natsServers || 'nats://localhost:4222',
+      // Additional client configuration
     });
   }
 
-  async createTopicProducer<T>(topicName: string, messageFns: MessageFns<T>): Promise<TopicProducer<T>> {
-    const producer = await this.client.createProducer({
-      topic: topicName,
-      sendTimeoutMs: 3000,
-      batchingEnabled: false,
-    });
-
-    return new TopicProducer<T>(producer, messageFns, this.config.name);
+  async createTopicPublisher<T>(topicName: string, messageFns: MessageFns<T>): Promise<TopicPublisher<T>> {
+    return new TopicPublisher<T>(this.client, messageFns, topicName, this.config.name);
   }
 
-
-
-
-
-  async createTopicConsumer<T>(topicName: string, messageFns: MessageFns<T>, subscription: string): Promise<TopicConsumer<T>> {
-    const consumer = await this.client.subscribe({
-      topic: topicName,
-      subscription: this.config.name + '-' + subscription,
-      subscriptionType: 'KeyShared',
-      // readCompacted: true,
-      subscriptionInitialPosition: 'Latest',
-      readCompacted: true
-    });
-
-    return new TopicConsumer<T>(consumer, messageFns);
+  async createTopicSubscriber<T>(topicName: string, messageFns: MessageFns<T>, subscription: string): Promise<TopicSubscriber<T>> {
+    return new TopicSubscriber<T>(this.client, messageFns, topicName, this.config.name + '-' + subscription);
   }
 
-  
   async loop(loopFunction: () => Promise<void>) {
     const intervalMs = 1000 / this.config.rate;
     while (true) {
@@ -63,34 +54,75 @@ export class Node {
   }
 }
 
-export class TopicProducer<T> {
-  constructor(private producer: Pulsar.Producer, private messageFns: MessageFns<T>, private nodeName: string) {}
+export class TopicPublisher<T> {
+  constructor(
+    private client: Nats.NatsConnection,
+    private messageFns: MessageFns<T>,
+    private topicName: string,
+    private nodeName: string
+  ) {}
 
   async sendMsg(message: T): Promise<void> {
     const rawMsg = this.messageFns.encode(message).finish();
-    const msgId = await this.producer.send({
-      data: Buffer.from(rawMsg),
-      partitionKey: this.nodeName
-    });
-    console.log('Message sent:', msgId, message)
+    const msgHeaders = Nats.headers();
+    msgHeaders.append('node', this.nodeName);
+    await this.client.publish(this.topicName, rawMsg, { headers: msgHeaders });
+    console.log('Message sent:', message);
   }
 
   async close(): Promise<void> {
-    await this.producer.close();
+    // No need to close the producer in NATS
   }
 }
 
-export class TopicConsumer<T> {
-  constructor(private consumer: Pulsar.Consumer, private messageFns: MessageFns<T>) {}
+// Define event types
+interface TopicConsumerEvents<T> {
+  message: (msg: T) => void;
+  error: (err: Error) => void;
+}
 
-  async receiveMsg(): Promise<T> {
-    const msg = await this.consumer.receive();
-    const decodedMsg = this.messageFns.decode(msg.getData());
-    await this.consumer.acknowledge(msg);
-    return decodedMsg;
+export class TopicSubscriber<T> extends EventEmitter {
+  private subscription: Nats.Subscription;
+
+  constructor(
+    private client: Nats.NatsConnection,
+    private messageFns: MessageFns<T>,
+    private topicName: string,
+    private subscriptionName: string
+  ) {
+    super();
+    this.subscription = this.client.subscribe(this.topicName, {
+      queue: this.subscriptionName,
+    });
+    this.setupSubscription();
+  }
+
+  private setupSubscription(): void {
+    this.subscription.callback = (err, msg) => {
+      if (err) {
+        this.emit('error', err);
+        return;
+      }
+      try {
+        const decodedMsg = this.messageFns.decode(msg.data);
+        this.emit('message', decodedMsg);
+      } catch (e) {
+        console.error('Error decoding message:', e);
+        this.emit('error', e as Error);
+      }
+    };
   }
 
   async close(): Promise<void> {
-    await this.consumer.close();
+    this.subscription.unsubscribe();
+  }
+
+  // Override the EventEmitter `on` and `emit` for strong typing
+  on<K extends keyof TopicConsumerEvents<T>>(event: K, listener: TopicConsumerEvents<T>[K]): this {
+    return super.on(event, listener);
+  }
+
+  emit<K extends keyof TopicConsumerEvents<T>>(event: K, ...args: Parameters<TopicConsumerEvents<T>[K]>): boolean {
+    return super.emit(event, ...args);
   }
 }

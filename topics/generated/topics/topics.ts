@@ -17,6 +17,30 @@ export interface leakSensor {
   isLeaking: boolean;
 }
 
+export interface imuData {
+  acceleration?: Vector3 | undefined;
+  magnetometer?: Vector3 | undefined;
+  gyroscope?: Vector3 | undefined;
+  orientation?: Quaternion | undefined;
+  linearAcceleration?: Vector3 | undefined;
+  gravity?: Vector3 | undefined;
+  temperature: number;
+  calibrationStatus: number;
+}
+
+export interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface Quaternion {
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+}
+
 function createBasehelloWorld(): helloWorld {
   return { message: "" };
 }
@@ -127,6 +151,384 @@ export const leakSensor: MessageFns<leakSensor> = {
   fromPartial<I extends Exact<DeepPartial<leakSensor>, I>>(object: I): leakSensor {
     const message = createBaseleakSensor();
     message.isLeaking = object.isLeaking ?? false;
+    return message;
+  },
+};
+
+function createBaseimuData(): imuData {
+  return {
+    acceleration: undefined,
+    magnetometer: undefined,
+    gyroscope: undefined,
+    orientation: undefined,
+    linearAcceleration: undefined,
+    gravity: undefined,
+    temperature: 0,
+    calibrationStatus: 0,
+  };
+}
+
+export const imuData: MessageFns<imuData> = {
+  encode(message: imuData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.acceleration !== undefined) {
+      Vector3.encode(message.acceleration, writer.uint32(18).fork()).join();
+    }
+    if (message.magnetometer !== undefined) {
+      Vector3.encode(message.magnetometer, writer.uint32(26).fork()).join();
+    }
+    if (message.gyroscope !== undefined) {
+      Vector3.encode(message.gyroscope, writer.uint32(34).fork()).join();
+    }
+    if (message.orientation !== undefined) {
+      Quaternion.encode(message.orientation, writer.uint32(42).fork()).join();
+    }
+    if (message.linearAcceleration !== undefined) {
+      Vector3.encode(message.linearAcceleration, writer.uint32(50).fork()).join();
+    }
+    if (message.gravity !== undefined) {
+      Vector3.encode(message.gravity, writer.uint32(58).fork()).join();
+    }
+    if (message.temperature !== 0) {
+      writer.uint32(65).double(message.temperature);
+    }
+    if (message.calibrationStatus !== 0) {
+      writer.uint32(72).uint32(message.calibrationStatus);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): imuData {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseimuData();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.acceleration = Vector3.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.magnetometer = Vector3.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.gyroscope = Vector3.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.orientation = Quaternion.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.linearAcceleration = Vector3.decode(reader, reader.uint32());
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.gravity = Vector3.decode(reader, reader.uint32());
+          continue;
+        case 8:
+          if (tag !== 65) {
+            break;
+          }
+
+          message.temperature = reader.double();
+          continue;
+        case 9:
+          if (tag !== 72) {
+            break;
+          }
+
+          message.calibrationStatus = reader.uint32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): imuData {
+    return {
+      acceleration: isSet(object.acceleration) ? Vector3.fromJSON(object.acceleration) : undefined,
+      magnetometer: isSet(object.magnetometer) ? Vector3.fromJSON(object.magnetometer) : undefined,
+      gyroscope: isSet(object.gyroscope) ? Vector3.fromJSON(object.gyroscope) : undefined,
+      orientation: isSet(object.orientation) ? Quaternion.fromJSON(object.orientation) : undefined,
+      linearAcceleration: isSet(object.linearAcceleration) ? Vector3.fromJSON(object.linearAcceleration) : undefined,
+      gravity: isSet(object.gravity) ? Vector3.fromJSON(object.gravity) : undefined,
+      temperature: isSet(object.temperature) ? globalThis.Number(object.temperature) : 0,
+      calibrationStatus: isSet(object.calibrationStatus) ? globalThis.Number(object.calibrationStatus) : 0,
+    };
+  },
+
+  toJSON(message: imuData): unknown {
+    const obj: any = {};
+    if (message.acceleration !== undefined) {
+      obj.acceleration = Vector3.toJSON(message.acceleration);
+    }
+    if (message.magnetometer !== undefined) {
+      obj.magnetometer = Vector3.toJSON(message.magnetometer);
+    }
+    if (message.gyroscope !== undefined) {
+      obj.gyroscope = Vector3.toJSON(message.gyroscope);
+    }
+    if (message.orientation !== undefined) {
+      obj.orientation = Quaternion.toJSON(message.orientation);
+    }
+    if (message.linearAcceleration !== undefined) {
+      obj.linearAcceleration = Vector3.toJSON(message.linearAcceleration);
+    }
+    if (message.gravity !== undefined) {
+      obj.gravity = Vector3.toJSON(message.gravity);
+    }
+    if (message.temperature !== 0) {
+      obj.temperature = message.temperature;
+    }
+    if (message.calibrationStatus !== 0) {
+      obj.calibrationStatus = Math.round(message.calibrationStatus);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<imuData>, I>>(base?: I): imuData {
+    return imuData.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<imuData>, I>>(object: I): imuData {
+    const message = createBaseimuData();
+    message.acceleration = (object.acceleration !== undefined && object.acceleration !== null)
+      ? Vector3.fromPartial(object.acceleration)
+      : undefined;
+    message.magnetometer = (object.magnetometer !== undefined && object.magnetometer !== null)
+      ? Vector3.fromPartial(object.magnetometer)
+      : undefined;
+    message.gyroscope = (object.gyroscope !== undefined && object.gyroscope !== null)
+      ? Vector3.fromPartial(object.gyroscope)
+      : undefined;
+    message.orientation = (object.orientation !== undefined && object.orientation !== null)
+      ? Quaternion.fromPartial(object.orientation)
+      : undefined;
+    message.linearAcceleration = (object.linearAcceleration !== undefined && object.linearAcceleration !== null)
+      ? Vector3.fromPartial(object.linearAcceleration)
+      : undefined;
+    message.gravity = (object.gravity !== undefined && object.gravity !== null)
+      ? Vector3.fromPartial(object.gravity)
+      : undefined;
+    message.temperature = object.temperature ?? 0;
+    message.calibrationStatus = object.calibrationStatus ?? 0;
+    return message;
+  },
+};
+
+function createBaseVector3(): Vector3 {
+  return { x: 0, y: 0, z: 0 };
+}
+
+export const Vector3: MessageFns<Vector3> = {
+  encode(message: Vector3, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.x !== 0) {
+      writer.uint32(9).double(message.x);
+    }
+    if (message.y !== 0) {
+      writer.uint32(17).double(message.y);
+    }
+    if (message.z !== 0) {
+      writer.uint32(25).double(message.z);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Vector3 {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseVector3();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.x = reader.double();
+          continue;
+        case 2:
+          if (tag !== 17) {
+            break;
+          }
+
+          message.y = reader.double();
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.z = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Vector3 {
+    return {
+      x: isSet(object.x) ? globalThis.Number(object.x) : 0,
+      y: isSet(object.y) ? globalThis.Number(object.y) : 0,
+      z: isSet(object.z) ? globalThis.Number(object.z) : 0,
+    };
+  },
+
+  toJSON(message: Vector3): unknown {
+    const obj: any = {};
+    if (message.x !== 0) {
+      obj.x = message.x;
+    }
+    if (message.y !== 0) {
+      obj.y = message.y;
+    }
+    if (message.z !== 0) {
+      obj.z = message.z;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Vector3>, I>>(base?: I): Vector3 {
+    return Vector3.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Vector3>, I>>(object: I): Vector3 {
+    const message = createBaseVector3();
+    message.x = object.x ?? 0;
+    message.y = object.y ?? 0;
+    message.z = object.z ?? 0;
+    return message;
+  },
+};
+
+function createBaseQuaternion(): Quaternion {
+  return { x: 0, y: 0, z: 0, w: 0 };
+}
+
+export const Quaternion: MessageFns<Quaternion> = {
+  encode(message: Quaternion, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.x !== 0) {
+      writer.uint32(9).double(message.x);
+    }
+    if (message.y !== 0) {
+      writer.uint32(17).double(message.y);
+    }
+    if (message.z !== 0) {
+      writer.uint32(25).double(message.z);
+    }
+    if (message.w !== 0) {
+      writer.uint32(33).double(message.w);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): Quaternion {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQuaternion();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.x = reader.double();
+          continue;
+        case 2:
+          if (tag !== 17) {
+            break;
+          }
+
+          message.y = reader.double();
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.z = reader.double();
+          continue;
+        case 4:
+          if (tag !== 33) {
+            break;
+          }
+
+          message.w = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Quaternion {
+    return {
+      x: isSet(object.x) ? globalThis.Number(object.x) : 0,
+      y: isSet(object.y) ? globalThis.Number(object.y) : 0,
+      z: isSet(object.z) ? globalThis.Number(object.z) : 0,
+      w: isSet(object.w) ? globalThis.Number(object.w) : 0,
+    };
+  },
+
+  toJSON(message: Quaternion): unknown {
+    const obj: any = {};
+    if (message.x !== 0) {
+      obj.x = message.x;
+    }
+    if (message.y !== 0) {
+      obj.y = message.y;
+    }
+    if (message.z !== 0) {
+      obj.z = message.z;
+    }
+    if (message.w !== 0) {
+      obj.w = message.w;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Quaternion>, I>>(base?: I): Quaternion {
+    return Quaternion.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Quaternion>, I>>(object: I): Quaternion {
+    const message = createBaseQuaternion();
+    message.x = object.x ?? 0;
+    message.y = object.y ?? 0;
+    message.z = object.z ?? 0;
+    message.w = object.w ?? 0;
     return message;
   },
 };

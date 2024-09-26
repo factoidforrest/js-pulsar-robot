@@ -5,3 +5,49 @@ package topics;
 message hello_world { string message = 1; }
 
 message leak_sensor { bool is_leaking = 1; }
+
+// message imu_data {
+//   message Vector3 {
+//     double x = 1;
+//     double y = 2;
+//     double z = 3;
+//   }
+
+//   message Quaternion {
+//     double x = 1;
+//     double y = 2;
+//     double z = 3;
+//     double w = 4;
+//   }
+
+//   uint64 timestamp = 1;
+//   Quaternion orientation = 2;
+//   Vector3 angular_velocity = 3;
+//   Vector3 linear_acceleration = 4;
+//   Vector3 magnetic_field = 5;
+//   double temperature = 6;
+// }
+
+message imuData {
+  Vector3 acceleration = 2;
+  Vector3 magnetometer = 3;
+  Vector3 gyroscope = 4;
+  Quaternion orientation = 5;
+  Vector3 linearAcceleration = 6;
+  Vector3 gravity = 7;
+  double temperature = 8;
+  uint32 calibrationStatus = 9;
+}
+
+message Vector3 {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+}
+
+message Quaternion {
+  double x = 1;
+  double y = 2;
+  double z = 3;
+  double w = 4;
+}
