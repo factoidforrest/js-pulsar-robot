@@ -38,14 +38,15 @@ message Quaternion {
 }
 
 message gpsData {
-  double timestamp = 1;
-  double latitude = 2;
-  double longitude = 3;
-  double altitude = 4;
-  double speed = 5;
-  double course = 6;
-  int32 satellites = 7;
-  double hdop = 8;
-  string fix = 9;
-  string linkQuality = 10;
+
+  optional double timestamp = 1;
+  optional double latitude = 2;
+  optional double longitude = 3;
+  optional double altitude = 4;
+  optional double speed = 5;
+  optional double course = 6;
+  optional int32 satellites = 7;
+  optional double hdop = 8;
+  string fix = 9; // fix is required
+  optional string linkQuality = 10;
 }

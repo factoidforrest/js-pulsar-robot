@@ -10,16 +10,16 @@ class GPSNode {
 	private readonly port: SerialPort;
 	private readonly node: Node;
 	private readonly gpsData: {
-		timestamp: number | null;
-		latitude: number | null;
-		longitude: number | null;
-		altitude: number | null;
-		speed: number | null;
-		course: number | null;
-		satellites: number | null;
-		hdop: number | null;
-		fix: string | null;
-		linkQuality: string | null;
+		timestamp: number | undefined;
+		latitude: number | undefined;
+		longitude: number | undefined;
+		altitude: number | undefined;
+		speed: number | undefined;
+		course: number | undefined;
+		satellites: number | undefined;
+		hdop: number | undefined;
+		fix: 'None' | 'FIX_2D' | 'FIX_3D'
+		linkQuality: string | undefined;
 	};
 
 	private systemTimeSet = false;
@@ -29,7 +29,7 @@ class GPSNode {
 
 		this.gps = new GPS();
 		this.gpsData = {
-			linkQuality: 'unknown', timestamp: null, latitude: null, longitude: null, altitude: null, speed: null, course: null, satellites: null, hdop: null, fix: null,
+			linkQuality: 'unknown', timestamp: undefined, latitude: undefined, longitude: undefined, altitude: undefined, speed: undefined, course: undefined, satellites: undefined, hdop: undefined, fix: 'None',
 		};
 
 		// Set up listeners for specific NMEA sentence types
@@ -52,7 +52,7 @@ class GPSNode {
 	}
 
 	private handleGGA(data: GGASentence) {
-		this.gpsData.timestamp = data.time?.getTime() || null;
+		this.gpsData.timestamp = data.time?.getTime() || undefined;
 		this.gpsData.latitude = data.lat;
 		this.gpsData.longitude = data.lon;
 		this.gpsData.altitude = data.alt;
@@ -65,7 +65,7 @@ class GPSNode {
 	}
 
 	private handleRMC(data: RMCSentence) {
-		this.gpsData.timestamp = data.time?.getTime() || null;
+		this.gpsData.timestamp = data.time?.getTime() || undefined;
 		this.gpsData.latitude = data.lat;
 		this.gpsData.longitude = data.lon;
 		this.gpsData.speed = data.speed;
@@ -90,8 +90,8 @@ class GPSNode {
 		this.publishGPSData();
 	}
 
-	private updateLinkQuality(quality: number | null) {
-		if (quality === null) {
+	private updateLinkQuality(quality: number | undefined) {
+		if (quality === undefined) {
 			this.gpsData.linkQuality = 'unknown';
 		} else if (quality >= 4) {
 			this.gpsData.linkQuality = 'excellent';
@@ -104,11 +104,11 @@ class GPSNode {
 		}
 	}
 
-	private setSystemTime(time: Date | null) {
+	private setSystemTime(time: Date | undefined) {
 		if (!this.systemTimeSet && time) {
 			// Set system time (this requires root privileges)
 			const {exec} = require('node:child_process');
-			exec(`sudo date -s "${time.toISOString()}"`, (error: Error | null) => {
+			exec(`sudo date -s "${time.toISOString()}"`, (error: Error | undefined) => {
 				if (error) {
 					console.error(`Error setting system time: ${error}`);
 				} else {
@@ -119,6 +119,7 @@ class GPSNode {
 	}
 
 	private publishGPSData() {
+		
 		this.publisher.sendMsg(this.gpsData);
 	}
 }

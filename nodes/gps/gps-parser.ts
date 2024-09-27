@@ -22,135 +22,135 @@ interface BaseSentence {
 
 interface GGASentence extends BaseSentence {
   type: 'GGA';
-  time: Date | null;
-  lat: number | null;
-  lon: number | null;
-  alt: number | null;
+  time: Date | undefined;
+  lat: number | undefined;
+  lon: number | undefined;
+  alt: number | undefined;
   quality: FixQuality;
-  satellites: number | null;
-  hdop: number | null;
-  geoidal: number | null;
-  age: number | null;
-  stationId: number | null;
+  satellites: number | undefined;
+  hdop: number | undefined;
+  geoidal: number | undefined;
+  age: number | undefined;
+  stationId: number | undefined;
 }
 
 interface GSASentence extends BaseSentence {
   type: 'GSA';
-  mode: 'manual' | 'automatic' | null;
-  fix: '2D' | '3D' | null;
+  mode: 'manual' | 'automatic' | undefined;
+  fix: 'FIX_2D' | 'FIX_3D' | 'None';
   satellites: number[];
-  pdop: number | null;
-  hdop: number | null;
-  vdop: number | null;
-  systemId: number | null;
+  pdop: number | undefined;
+  hdop: number | undefined;
+  vdop: number | undefined;
+  systemId: number | undefined;
   system: string;
 }
 
 interface RMCSentence extends BaseSentence {
   type: 'RMC';
-  time: Date | null;
-  status: 'active' | 'void' | null;
-  lat: number | null;
-  lon: number | null;
-  speed: number | null;
-  track: number | null;
-  variation: number | null;
-  faa: FAAMode | null;
-  navStatus: string | null;
+  time: Date | undefined;
+  status: 'active' | 'void' | undefined;
+  lat: number | undefined;
+  lon: number | undefined;
+  speed: number | undefined;
+  track: number | undefined;
+  variation: number | undefined;
+  faa: FAAMode | undefined;
+  navStatus: string | undefined;
 }
 
 interface VTGSentence extends BaseSentence {
   type: 'VTG';
-  track: number | null;
-  trackMagnetic: number | null;
-  speed: number | null;
-  faa: FAAMode | null;
+  track: number | undefined;
+  trackMagnetic: number | undefined;
+  speed: number | undefined;
+  faa: FAAMode | undefined;
 }
 
 interface GSVSentence extends BaseSentence {
   type: 'GSV';
-  msgNumber: number | null;
-  msgsTotal: number | null;
-  satsInView: number | null;
+  msgNumber: number | undefined;
+  msgsTotal: number | undefined;
+  satsInView: number | undefined;
   satellites: SatelliteInfo[];
-  signalId: number | null;
+  signalId: number | undefined;
   system: string;
 }
 
 interface GLLSentence extends BaseSentence {
   type: 'GLL';
-  time: Date | null;
-  status: 'active' | 'void' | null;
-  lat: number | null;
-  lon: number | null;
-  faa: FAAMode | null;
+  time: Date | undefined;
+  status: 'active' | 'void' | undefined;
+  lat: number | undefined;
+  lon: number | undefined;
+  faa: FAAMode | undefined;
 }
 
 interface ZDASentence extends BaseSentence {
   type: 'ZDA';
-  time: Date | null;
+  time: Date | undefined;
 }
 
 interface GSTSentence extends BaseSentence {
   type: 'GST';
-  time: Date | null;
-  rms: number | null;
-  ellipseMajor: number | null;
-  ellipseMinor: number | null;
-  ellipseOrientation: number | null;
-  latitudeError: number | null;
-  longitudeError: number | null;
-  heightError: number | null;
+  time: Date | undefined;
+  rms: number | undefined;
+  ellipseMajor: number | undefined;
+  ellipseMinor: number | undefined;
+  ellipseOrientation: number | undefined;
+  latitudeError: number | undefined;
+  longitudeError: number | undefined;
+  heightError: number | undefined;
 }
 
 interface HDTSentence extends BaseSentence {
   type: 'HDT';
-  heading: number | null;
+  heading: number | undefined;
   trueNorth: boolean;
 }
 
 interface GRSSentence extends BaseSentence {
   type: 'GRS';
-  time: Date | null;
-  mode: number | null;
+  time: Date | undefined;
+  mode: number | undefined;
   res: number[];
 }
 
 interface GBSSentence extends BaseSentence {
   type: 'GBS';
-  time: Date | null;
-  errLat: number | null;
-  errLon: number | null;
-  errAlt: number | null;
-  failedSat: number | null;
-  probFailedSat: number | null;
-  biasFailedSat: number | null;
-  stdFailedSat: number | null;
-  systemId: number | null;
-  signalId: number | null;
+  time: Date | undefined;
+  errLat: number | undefined;
+  errLon: number | undefined;
+  errAlt: number | undefined;
+  failedSat: number | undefined;
+  probFailedSat: number | undefined;
+  biasFailedSat: number | undefined;
+  stdFailedSat: number | undefined;
+  systemId: number | undefined;
+  signalId: number | undefined;
 }
 
 interface GNSSentence extends BaseSentence {
   type: 'GNS';
-  time: Date | null;
-  lat: number | null;
-  lon: number | null;
+  time: Date | undefined;
+  lat: number | undefined;
+  lon: number | undefined;
   mode: string;
-  satsUsed: number | null;
-  hdop: number | null;
-  alt: number | null;
-  sep: number | null;
-  diffAge: number | null;
-  diffStation: number | null;
-  navStatus: string | null;
+  satsUsed: number | undefined;
+  hdop: number | undefined;
+  alt: number | undefined;
+  sep: number | undefined;
+  diffAge: number | undefined;
+  diffStation: number | undefined;
+  navStatus: string | undefined;
 }
 
 interface SatelliteInfo {
-  prn: number | null;
-  elevation: number | null;
-  azimuth: number | null;
-  snr: number | null;
-  status: 'tracking' | 'in view' | null;
+  prn: number | undefined;
+  elevation: number | undefined;
+  azimuth: number | undefined;
+  snr: number | undefined;
+  status: 'tracking' | 'in view' | undefined;
   system: string;
   key: string;
 }
@@ -196,7 +196,7 @@ class GPSParser extends EventEmitter {
     }
   }
 
-  private parseSentence(sentence: string): ParsedSentence | null {
+  private parseSentence(sentence: string): ParsedSentence | undefined {
     const fields = sentence.slice(1, -3).split(',');
     const type = fields[0].slice(2);
     const checksum = sentence.slice(-2);
@@ -215,7 +215,7 @@ class GPSParser extends EventEmitter {
         case 'GRS': return this.parseGRS(fields);
         case 'GBS': return this.parseGBS(fields);
         case 'GNS': return this.parseGNS(fields);
-        default: return null;
+        default: return undefined;
       }
     })();
 
@@ -247,7 +247,7 @@ class GPSParser extends EventEmitter {
     const satellites: number[] = [];
     for (let i = 3; i <= 14; i++) {
       const sat = this.parseNumber(fields[i]);
-      if (sat !== null) satellites.push(sat);
+      if (sat !== undefined) satellites.push(sat);
     }
 
     return {
@@ -258,7 +258,7 @@ class GPSParser extends EventEmitter {
       pdop: this.parseNumber(fields[15]),
       hdop: this.parseNumber(fields[16]),
       vdop: this.parseNumber(fields[17]),
-      systemId: fields.length > 18 ? this.parseNumber(fields[18]) : null,
+      systemId: fields.length > 18 ? this.parseNumber(fields[18]) : undefined,
       system: fields.length > 18 ? this.parseSystemId(this.parseNumber(fields[18])) : 'unknown',
     } as GSASentence;
   }
@@ -273,8 +273,8 @@ class GPSParser extends EventEmitter {
       speed: this.parseKnots(fields[7]),
       track: this.parseNumber(fields[8]),
       variation: this.parseRMCVariation(fields[10], fields[11]),
-      faa: fields.length > 13 ? this.parseFAA(fields[12]) : null,
-      navStatus: fields.length > 14 ? fields[13] : null,
+      faa: fields.length > 13 ? this.parseFAA(fields[12]) : undefined,
+      navStatus: fields.length > 14 ? fields[13] : undefined,
     } as RMCSentence;
   }
 
@@ -284,7 +284,7 @@ class GPSParser extends EventEmitter {
       track: this.parseNumber(fields[1]),
       trackMagnetic: this.parseNumber(fields[3]),
       speed: this.parseKnots(fields[5]),
-      faa: fields.length === 11 ? this.parseFAA(fields[9]) : null,
+      faa: fields.length === 11 ? this.parseFAA(fields[9]) : undefined,
     } as VTGSentence;
   }
 
@@ -300,7 +300,7 @@ class GPSParser extends EventEmitter {
         elevation: this.parseNumber(fields[i + 1]),
         azimuth: this.parseNumber(fields[i + 2]),
         snr,
-        status: prn !== null ? (snr !== null ? 'tracking' : 'in view') : null,
+        status: prn !== undefined ? (snr !== undefined ? 'tracking' : 'in view') : undefined,
         system,
         key: fields[0].slice(1, 3) + prn,
       });
@@ -312,7 +312,7 @@ class GPSParser extends EventEmitter {
       msgsTotal: this.parseNumber(fields[1]),
       satsInView: this.parseNumber(fields[3]),
       satellites,
-      signalId: fields.length % 4 === 2 ? this.parseNumber(fields[fields.length - 2]) : null,
+      signalId: fields.length % 4 === 2 ? this.parseNumber(fields[fields.length - 2]) : undefined,
       system,
     } as GSVSentence;
   }
@@ -324,7 +324,7 @@ class GPSParser extends EventEmitter {
       lon: this.parseCoordinate(fields[3], fields[4]),
       time: this.parseTime(fields[5]),
       status: this.parseRMCStatus(fields[6]),
-      faa: fields.length === 9 ? this.parseFAA(fields[7]) : null,
+      faa: fields.length === 9 ? this.parseFAA(fields[7]) : undefined,
     } as GLLSentence;
   }
 
@@ -361,7 +361,7 @@ class GPSParser extends EventEmitter {
     const res: number[] = [];
     for (let i = 3; i <= 14; i++) {
       const val = this.parseNumber(fields[i]);
-      if (val !== null) res.push(val);
+      if (val !== undefined) res.push(val);
     }
 
     return {
@@ -383,8 +383,8 @@ class GPSParser extends EventEmitter {
       probFailedSat: this.parseNumber(fields[6]),
       biasFailedSat: this.parseNumber(fields[7]),
       stdFailedSat: this.parseNumber(fields[8]),
-      systemId: fields.length === 12 ? this.parseNumber(fields[9]) : null,
-      signalId: fields.length === 12 ? this.parseNumber(fields[10]) : null,
+      systemId: fields.length === 12 ? this.parseNumber(fields[9]) : undefined,
+      signalId: fields.length === 12 ? this.parseNumber(fields[10]) : undefined,
     } as GBSSentence;
   }
 
@@ -401,12 +401,12 @@ class GPSParser extends EventEmitter {
       sep: this.parseNumber(fields[10]),
       diffAge: this.parseNumber(fields[11]),
       diffStation: this.parseNumber(fields[12]),
-      navStatus: fields.length === 15 ? fields[13] : null,
+      navStatus: fields.length === 15 ? fields[13] : undefined,
     } as GNSSentence;
   }
 
-  private parseTime(time: string, date?: string): Date | null {
-    if (time === '') return null;
+  private parseTime(time: string, date?: string): Date | undefined {
+    if (time === '') return undefined;
 
     const hours = parseInt(time.slice(0, 2));
     const minutes = parseInt(time.slice(2, 4));
@@ -424,8 +424,8 @@ class GPSParser extends EventEmitter {
     return now;
   }
 
-  private parseCoordinate(coord: string, dir: string): number | null {
-    if (coord === '') return null;
+  private parseCoordinate(coord: string, dir: string): number | undefined {
+    if (coord === '') return undefined;
 
     const deg = parseFloat(coord.slice(0, 2));
     const min = parseFloat(coord.slice(2));
@@ -438,39 +438,39 @@ class GPSParser extends EventEmitter {
     return result;
   }
 
-  private parseNumber(num: string): number | null {
-    return num === '' ? null : parseFloat(num);
+  private parseNumber(num: string): number | undefined {
+    return num === '' ? undefined : parseFloat(num);
   }
 
-  private parseKnots(knots: string): number | null {
-    return knots === '' ? null : parseFloat(knots) * 1.852;
+  private parseKnots(knots: string): number | undefined {
+    return knots === '' ? undefined : parseFloat(knots) * 1.852;
   }
 
-  private parseGSAMode(mode: string): 'manual' | 'automatic' | null {
+  private parseGSAMode(mode: string): 'manual' | 'automatic' | undefined {
     switch (mode) {
       case 'M': return 'manual';
       case 'A': return 'automatic';
-      default: return null;
+      default: return undefined;
     }
   }
 
-  private parseGSAFix(fix: string): '2D' | '3D' | null {
+  private parseGSAFix(fix: string): GSASentence['fix'] {
     switch (fix) {
-      case '2': return '2D';
-      case '3': return '3D';
-      default: return null;
+      case '2': return 'FIX_2D';
+      case '3': return 'FIX_3D';
+      default: return 'None';
     }
   }
 
-  private parseRMCStatus(status: string): 'active' | 'void' | null {
+  private parseRMCStatus(status: string): 'active' | 'void' | undefined {
     switch (status) {
       case 'A': return 'active';
       case 'V': return 'void';
-      default: return null;
+      default: return undefined;
     }
   }
 
-  private parseFAA(faa: string): FAAMode | null {
+  private parseFAA(faa: string): FAAMode | undefined {
     switch (faa) {
       case 'A': return 'autonomous';
       case 'D': return 'differential';
@@ -481,23 +481,23 @@ class GPSParser extends EventEmitter {
       case 'P': return 'precise';
       case 'R': return 'rtk';
       case 'F': return 'rtk-float';
-      default: return null;
+      default: return undefined;
     }
   }
 
-  private parseRMCVariation(variation: string, direction: string): number | null {
-    if (variation === '' || direction === '') return null;
+  private parseRMCVariation(variation: string, direction: string): number | undefined {
+    if (variation === '' || direction === '') return undefined;
     const value = parseFloat(variation);
     return direction === 'W' ? -value : value;
   }
 
-  private parseDist(dist: string, unit: string): number | null {
-    if (dist === '') return null;
+  private parseDist(dist: string, unit: string): number | undefined {
+    if (dist === '') return undefined;
     if (unit === 'M' || unit === '') return parseFloat(dist);
     throw new Error('Unknown distance unit: ' + unit);
   }
 
-  private parseSystemId(systemId: number | null): string {
+  private parseSystemId(systemId: number | undefined): string {
     switch (systemId) {
       case 0: return 'QZSS';
       case 1: return 'GPS';

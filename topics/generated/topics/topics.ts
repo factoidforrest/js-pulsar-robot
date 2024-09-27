@@ -49,16 +49,19 @@ export interface Quaternion {
 }
 
 export interface gpsData {
-  timestamp: number;
-  latitude: number;
-  longitude: number;
-  altitude: number;
-  speed: number;
-  course: number;
-  satellites: number;
-  hdop: number;
+  timestamp?: number | undefined;
+  latitude?: number | undefined;
+  longitude?: number | undefined;
+  altitude?: number | undefined;
+  speed?: number | undefined;
+  course?: number | undefined;
+  satellites?: number | undefined;
+  hdop?:
+    | number
+    | undefined;
+  /** fix is required */
   fix: string;
-  linkQuality: string;
+  linkQuality?: string | undefined;
 }
 
 function createBasehelloWorld(): helloWorld {
@@ -663,49 +666,49 @@ export const Quaternion: MessageFns<Quaternion> = {
 
 function createBasegpsData(): gpsData {
   return {
-    timestamp: 0,
-    latitude: 0,
-    longitude: 0,
-    altitude: 0,
-    speed: 0,
-    course: 0,
-    satellites: 0,
-    hdop: 0,
+    timestamp: undefined,
+    latitude: undefined,
+    longitude: undefined,
+    altitude: undefined,
+    speed: undefined,
+    course: undefined,
+    satellites: undefined,
+    hdop: undefined,
     fix: "",
-    linkQuality: "",
+    linkQuality: undefined,
   };
 }
 
 export const gpsData: MessageFns<gpsData> = {
   encode(message: gpsData, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.timestamp !== 0) {
+    if (message.timestamp !== undefined) {
       writer.uint32(9).double(message.timestamp);
     }
-    if (message.latitude !== 0) {
+    if (message.latitude !== undefined) {
       writer.uint32(17).double(message.latitude);
     }
-    if (message.longitude !== 0) {
+    if (message.longitude !== undefined) {
       writer.uint32(25).double(message.longitude);
     }
-    if (message.altitude !== 0) {
+    if (message.altitude !== undefined) {
       writer.uint32(33).double(message.altitude);
     }
-    if (message.speed !== 0) {
+    if (message.speed !== undefined) {
       writer.uint32(41).double(message.speed);
     }
-    if (message.course !== 0) {
+    if (message.course !== undefined) {
       writer.uint32(49).double(message.course);
     }
-    if (message.satellites !== 0) {
+    if (message.satellites !== undefined) {
       writer.uint32(56).int32(message.satellites);
     }
-    if (message.hdop !== 0) {
+    if (message.hdop !== undefined) {
       writer.uint32(65).double(message.hdop);
     }
     if (message.fix !== "") {
       writer.uint32(74).string(message.fix);
     }
-    if (message.linkQuality !== "") {
+    if (message.linkQuality !== undefined) {
       writer.uint32(82).string(message.linkQuality);
     }
     return writer;
@@ -799,49 +802,49 @@ export const gpsData: MessageFns<gpsData> = {
 
   fromJSON(object: any): gpsData {
     return {
-      timestamp: isSet(object.timestamp) ? globalThis.Number(object.timestamp) : 0,
-      latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
-      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
-      altitude: isSet(object.altitude) ? globalThis.Number(object.altitude) : 0,
-      speed: isSet(object.speed) ? globalThis.Number(object.speed) : 0,
-      course: isSet(object.course) ? globalThis.Number(object.course) : 0,
-      satellites: isSet(object.satellites) ? globalThis.Number(object.satellites) : 0,
-      hdop: isSet(object.hdop) ? globalThis.Number(object.hdop) : 0,
+      timestamp: isSet(object.timestamp) ? globalThis.Number(object.timestamp) : undefined,
+      latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : undefined,
+      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : undefined,
+      altitude: isSet(object.altitude) ? globalThis.Number(object.altitude) : undefined,
+      speed: isSet(object.speed) ? globalThis.Number(object.speed) : undefined,
+      course: isSet(object.course) ? globalThis.Number(object.course) : undefined,
+      satellites: isSet(object.satellites) ? globalThis.Number(object.satellites) : undefined,
+      hdop: isSet(object.hdop) ? globalThis.Number(object.hdop) : undefined,
       fix: isSet(object.fix) ? globalThis.String(object.fix) : "",
-      linkQuality: isSet(object.linkQuality) ? globalThis.String(object.linkQuality) : "",
+      linkQuality: isSet(object.linkQuality) ? globalThis.String(object.linkQuality) : undefined,
     };
   },
 
   toJSON(message: gpsData): unknown {
     const obj: any = {};
-    if (message.timestamp !== 0) {
+    if (message.timestamp !== undefined) {
       obj.timestamp = message.timestamp;
     }
-    if (message.latitude !== 0) {
+    if (message.latitude !== undefined) {
       obj.latitude = message.latitude;
     }
-    if (message.longitude !== 0) {
+    if (message.longitude !== undefined) {
       obj.longitude = message.longitude;
     }
-    if (message.altitude !== 0) {
+    if (message.altitude !== undefined) {
       obj.altitude = message.altitude;
     }
-    if (message.speed !== 0) {
+    if (message.speed !== undefined) {
       obj.speed = message.speed;
     }
-    if (message.course !== 0) {
+    if (message.course !== undefined) {
       obj.course = message.course;
     }
-    if (message.satellites !== 0) {
+    if (message.satellites !== undefined) {
       obj.satellites = Math.round(message.satellites);
     }
-    if (message.hdop !== 0) {
+    if (message.hdop !== undefined) {
       obj.hdop = message.hdop;
     }
     if (message.fix !== "") {
       obj.fix = message.fix;
     }
-    if (message.linkQuality !== "") {
+    if (message.linkQuality !== undefined) {
       obj.linkQuality = message.linkQuality;
     }
     return obj;
@@ -852,16 +855,16 @@ export const gpsData: MessageFns<gpsData> = {
   },
   fromPartial<I extends Exact<DeepPartial<gpsData>, I>>(object: I): gpsData {
     const message = createBasegpsData();
-    message.timestamp = object.timestamp ?? 0;
-    message.latitude = object.latitude ?? 0;
-    message.longitude = object.longitude ?? 0;
-    message.altitude = object.altitude ?? 0;
-    message.speed = object.speed ?? 0;
-    message.course = object.course ?? 0;
-    message.satellites = object.satellites ?? 0;
-    message.hdop = object.hdop ?? 0;
+    message.timestamp = object.timestamp ?? undefined;
+    message.latitude = object.latitude ?? undefined;
+    message.longitude = object.longitude ?? undefined;
+    message.altitude = object.altitude ?? undefined;
+    message.speed = object.speed ?? undefined;
+    message.course = object.course ?? undefined;
+    message.satellites = object.satellites ?? undefined;
+    message.hdop = object.hdop ?? undefined;
     message.fix = object.fix ?? "";
-    message.linkQuality = object.linkQuality ?? "";
+    message.linkQuality = object.linkQuality ?? undefined;
     return message;
   },
 };
