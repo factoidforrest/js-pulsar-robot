@@ -57,7 +57,7 @@ export class EKFPositionEstimator {
     }
 
     static fixSufficient(gps: gpsData):  gps is gpsData & { altitude: number; fix: 'FIX_3D'; } {
-        if (gps.linkQuality !== 'excellent' && gps.fix !== 'good'){
+        if (gps.linkQuality !== 'excellent' && gps.linkQuality !== 'good'){
             console.log('insufficient link quality of ', gps.linkQuality)
             return false;
         }
