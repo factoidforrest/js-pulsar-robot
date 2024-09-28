@@ -88,7 +88,7 @@ export class TopicPublisher<T> {
 		await this.client.publish(this.topicName, rawMessage, {
 			headers: messageHeaders,
 		});
-		console.log('Message sent:', message);
+		console.log('Message sent:', this.topicName, message);
 	}
 
 	async close(): Promise<void> {
