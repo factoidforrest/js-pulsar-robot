@@ -56,12 +56,13 @@ export interface gpsData {
   speed?: number | undefined;
   course?: number | undefined;
   satellites?: number | undefined;
-  hdop?:
+  pdop?:
     | number
     | undefined;
   /** fix is required */
   fix: string;
   linkQuality?: string | undefined;
+  dgps: boolean;
 }
 
 function createBasehelloWorld(): helloWorld {
@@ -673,9 +674,10 @@ function createBasegpsData(): gpsData {
     speed: undefined,
     course: undefined,
     satellites: undefined,
-    hdop: undefined,
+    pdop: undefined,
     fix: "",
     linkQuality: undefined,
+    dgps: false,
   };
 }
 
@@ -702,14 +704,17 @@ export const gpsData: MessageFns<gpsData> = {
     if (message.satellites !== undefined) {
       writer.uint32(56).int32(message.satellites);
     }
-    if (message.hdop !== undefined) {
-      writer.uint32(65).double(message.hdop);
+    if (message.pdop !== undefined) {
+      writer.uint32(65).double(message.pdop);
     }
     if (message.fix !== "") {
       writer.uint32(74).string(message.fix);
     }
     if (message.linkQuality !== undefined) {
       writer.uint32(82).string(message.linkQuality);
+    }
+    if (message.dgps !== false) {
+      writer.uint32(88).bool(message.dgps);
     }
     return writer;
   },
@@ -775,7 +780,7 @@ export const gpsData: MessageFns<gpsData> = {
             break;
           }
 
-          message.hdop = reader.double();
+          message.pdop = reader.double();
           continue;
         case 9:
           if (tag !== 74) {
@@ -790,6 +795,13 @@ export const gpsData: MessageFns<gpsData> = {
           }
 
           message.linkQuality = reader.string();
+          continue;
+        case 11:
+          if (tag !== 88) {
+            break;
+          }
+
+          message.dgps = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -809,9 +821,10 @@ export const gpsData: MessageFns<gpsData> = {
       speed: isSet(object.speed) ? globalThis.Number(object.speed) : undefined,
       course: isSet(object.course) ? globalThis.Number(object.course) : undefined,
       satellites: isSet(object.satellites) ? globalThis.Number(object.satellites) : undefined,
-      hdop: isSet(object.hdop) ? globalThis.Number(object.hdop) : undefined,
+      pdop: isSet(object.pdop) ? globalThis.Number(object.pdop) : undefined,
       fix: isSet(object.fix) ? globalThis.String(object.fix) : "",
       linkQuality: isSet(object.linkQuality) ? globalThis.String(object.linkQuality) : undefined,
+      dgps: isSet(object.dgps) ? globalThis.Boolean(object.dgps) : false,
     };
   },
 
@@ -838,14 +851,17 @@ export const gpsData: MessageFns<gpsData> = {
     if (message.satellites !== undefined) {
       obj.satellites = Math.round(message.satellites);
     }
-    if (message.hdop !== undefined) {
-      obj.hdop = message.hdop;
+    if (message.pdop !== undefined) {
+      obj.pdop = message.pdop;
     }
     if (message.fix !== "") {
       obj.fix = message.fix;
     }
     if (message.linkQuality !== undefined) {
       obj.linkQuality = message.linkQuality;
+    }
+    if (message.dgps !== false) {
+      obj.dgps = message.dgps;
     }
     return obj;
   },
@@ -862,9 +878,10 @@ export const gpsData: MessageFns<gpsData> = {
     message.speed = object.speed ?? undefined;
     message.course = object.course ?? undefined;
     message.satellites = object.satellites ?? undefined;
-    message.hdop = object.hdop ?? undefined;
+    message.pdop = object.pdop ?? undefined;
     message.fix = object.fix ?? "";
     message.linkQuality = object.linkQuality ?? undefined;
+    message.dgps = object.dgps ?? false;
     return message;
   },
 };

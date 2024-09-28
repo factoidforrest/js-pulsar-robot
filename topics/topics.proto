@@ -1,3 +1,4 @@
+
 syntax = "proto3";
 
 package topics;
@@ -46,7 +47,8 @@ message gpsData {
   optional double speed = 5;
   optional double course = 6;
   optional int32 satellites = 7;
-  optional double hdop = 8;
+  optional double pdop = 8;
   string fix = 9; // fix is required
   optional string linkQuality = 10;
+  bool dgps = 11;
 }

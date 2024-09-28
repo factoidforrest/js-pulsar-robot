@@ -17,10 +17,12 @@ class GPSNode {
 		speed: number | undefined;
 		course: number | undefined;
 		satellites: number | undefined;
-		hdop: number | undefined;
+		pdop: number | undefined;
 		fix: 'None' | 'FIX_2D' | 'FIX_3D'
 		linkQuality: string | undefined;
+		dgps: boolean;
 	};
+
 
 	private systemTimeSet = false;
 
@@ -29,9 +31,13 @@ class GPSNode {
 
 		this.gps = new GPS();
 		this.gpsData = {
-			linkQuality: 'unknown', timestamp: undefined, latitude: undefined, longitude: undefined, altitude: undefined, speed: undefined, course: undefined, satellites: undefined, hdop: undefined, fix: 'None',
+			dgps: false, linkQuality: 'unknown', timestamp: undefined, latitude: undefined, longitude: undefined, altitude: undefined, speed: undefined, course: undefined, satellites: undefined, pdop: undefined, fix: 'None',
 		};
 
+		this.gps.on('data', (msg) => {
+			console.log('received message of type', msg.type)
+			console.log(msg)
+		})
 		// Set up listeners for specific NMEA sentence types
 		this.gps.on('GGA', this.handleGGA.bind(this));
 		this.gps.on('RMC', this.handleRMC.bind(this));
@@ -41,7 +47,7 @@ class GPSNode {
 
 		// Listen to the Raspberry Pi serial port for UART 0 connected via GPIO
 		this.port = new SerialPort({
-			path: '/dev/ttyS0',
+			path: '/dev/ttyAMA0',
 			baudRate: 9600,
 		});
 
@@ -57,9 +63,8 @@ class GPSNode {
 		this.gpsData.longitude = data.lon;
 		this.gpsData.altitude = data.alt;
 		this.gpsData.satellites = data.satellites;
-		this.gpsData.hdop = data.hdop;
-
-		this.updateLinkQuality(data.quality);
+		this.gpsData.dgps = data.quality === 2;
+		// this.updateLinkQuality(data.quality);
 		this.setSystemTime(data.time);
 		this.publishGPSData();
 	}
@@ -77,6 +82,8 @@ class GPSNode {
 
 	private handleGSA(data: GSASentence) {
 		this.gpsData.fix = data.fix;
+		this.gpsData.pdop = data.pdop;
+		this.gpsData.linkQuality = this.updateLinkQuality(data.pdop);
 		this.publishGPSData();
 	}
 
@@ -90,17 +97,22 @@ class GPSNode {
 		this.publishGPSData();
 	}
 
-	private updateLinkQuality(quality: number | undefined) {
-		if (quality === undefined) {
-			this.gpsData.linkQuality = 'unknown';
-		} else if (quality >= 4) {
-			this.gpsData.linkQuality = 'excellent';
-		} else if (quality === 3) {
-			this.gpsData.linkQuality = 'good';
-		} else if (quality === 2) {
-			this.gpsData.linkQuality = 'moderate';
+	private updateLinkQuality(pdop: number | undefined) {
+		if (pdop === undefined) {
+			// Handle the case where pdop is undefined
+			return 'unknown';
+		}
+	
+		if (pdop <= 2.0) {
+			return 'excellent'; // Highly accurate, typically within a few meters
+		} else if (pdop <= 3.0) {
+			return 'good'; // Reliable, with accuracy around 5 meters or better
+		} else if (pdop <= 5.0) {
+			return 'moderate'; // Acceptable, accuracy may be around 10 meters
+		} else if (pdop <= 10.0) {
+			return 'fair'; // Less reliable, with errors around 10 to 20 meters
 		} else {
-			this.gpsData.linkQuality = 'poor';
+			return 'poor'; // Inaccurate, errors likely beyond 20 meters
 		}
 	}
 

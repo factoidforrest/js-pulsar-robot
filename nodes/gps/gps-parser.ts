@@ -406,7 +406,7 @@ class GPSParser extends EventEmitter {
   }
 
   private parseTime(time: string, date?: string): Date | undefined {
-    if (time === '') return undefined;
+    if (time === ''|| time === undefined) return undefined;
 
     const hours = parseInt(time.slice(0, 2));
     const minutes = parseInt(time.slice(2, 4));
