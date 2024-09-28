@@ -1,10 +1,10 @@
 import { Node } from '../../lib/node-services.js';
-import { imuData, gpsData, speedEstimate, Vector3, Quaternion, depth, positionEstimate } from '../../topics/generated/topics/topics.js';
+import { imuData, gpsData, speedEstimate, depth, positionEstimate } from '../../topics/generated/topics/topics.js';
 import {State, EKFPositionEstimator} from './ekf'
 
 interface PositionEstimate {
   local: State;
-  global: { latitude: number; longitude: number; altitude: number; } | null;
+  global: { latitude: number; longitude: number; altitude: number; };
   timestamp: number;
 }
 
@@ -59,6 +59,7 @@ async function main() {
   // The rest of these messages are "updates" which adjust the EKF's state estimate but dont advance time or emit any predictions
   gpsTopic.on('message', (msg) => {
     ekf.updateGPS( msg);
+    console.log('GPS update')
   })
 
   speedTopic.on('message', (msg) => {

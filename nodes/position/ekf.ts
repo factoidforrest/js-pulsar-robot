@@ -298,8 +298,10 @@ export class EKFPositionEstimator {
         return { ...this.state };
     }
 
-    getGlobalPosition(): { latitude: number, longitude: number, altitude: number } | null {
-        if (!this.gpsReference) return null;
+    getGlobalPosition(): { latitude: number, longitude: number, altitude: number }  {
+        if (!this.gpsReference) {
+            throw new Error('Asked to compute global GPS reference without one ever being recorded')
+        };
         const [lat, lon] = this.localToGPS(this.state.x, this.state.y);
         return {
             latitude: lat,
