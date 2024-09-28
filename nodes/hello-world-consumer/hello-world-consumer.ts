@@ -9,8 +9,7 @@ async function main() {
   });
   const topic = await node.createTopicSubscriber(
     'hello_world',
-    helloWorld,
-    'my-subscription',
+    helloWorld
   );
 
   topic.on('message', (message) => {

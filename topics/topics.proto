@@ -52,3 +52,27 @@ message gpsData {
   optional string linkQuality = 10;
   bool dgps = 11;
 }
+
+message speedEstimate { double speed = 1; }
+
+message depth { double depth = 1; }
+
+message positionEstimate {
+  message State {
+    double x = 1;
+    double y = 2;
+    double z = 3;
+    double vx = 4;
+    double vy = 5;
+  }
+
+  message GlobalPosition {
+    double latitude = 1;
+    double longitude = 2;
+    double altitude = 3;
+  }
+
+  State local = 1;
+  GlobalPosition global = 2;
+  double timestamp = 3;
+}

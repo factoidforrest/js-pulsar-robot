@@ -65,6 +65,34 @@ export interface gpsData {
   dgps: boolean;
 }
 
+export interface speedEstimate {
+  speed: number;
+}
+
+export interface depth {
+  depth: number;
+}
+
+export interface PositionEstimate {
+  local?: PositionEstimate_State | undefined;
+  global?: PositionEstimate_GlobalPosition | undefined;
+  timestamp: number;
+}
+
+export interface PositionEstimate_State {
+  x: number;
+  y: number;
+  z: number;
+  vx: number;
+  vy: number;
+}
+
+export interface PositionEstimate_GlobalPosition {
+  latitude: number;
+  longitude: number;
+  altitude: number;
+}
+
 function createBasehelloWorld(): helloWorld {
   return { message: "" };
 }
@@ -882,6 +910,423 @@ export const gpsData: MessageFns<gpsData> = {
     message.fix = object.fix ?? "";
     message.linkQuality = object.linkQuality ?? undefined;
     message.dgps = object.dgps ?? false;
+    return message;
+  },
+};
+
+function createBasespeedEstimate(): speedEstimate {
+  return { speed: 0 };
+}
+
+export const speedEstimate: MessageFns<speedEstimate> = {
+  encode(message: speedEstimate, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.speed !== 0) {
+      writer.uint32(9).double(message.speed);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): speedEstimate {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasespeedEstimate();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.speed = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): speedEstimate {
+    return { speed: isSet(object.speed) ? globalThis.Number(object.speed) : 0 };
+  },
+
+  toJSON(message: speedEstimate): unknown {
+    const obj: any = {};
+    if (message.speed !== 0) {
+      obj.speed = message.speed;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<speedEstimate>, I>>(base?: I): speedEstimate {
+    return speedEstimate.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<speedEstimate>, I>>(object: I): speedEstimate {
+    const message = createBasespeedEstimate();
+    message.speed = object.speed ?? 0;
+    return message;
+  },
+};
+
+function createBasedepth(): depth {
+  return { depth: 0 };
+}
+
+export const depth: MessageFns<depth> = {
+  encode(message: depth, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.depth !== 0) {
+      writer.uint32(9).double(message.depth);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): depth {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasedepth();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.depth = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): depth {
+    return { depth: isSet(object.depth) ? globalThis.Number(object.depth) : 0 };
+  },
+
+  toJSON(message: depth): unknown {
+    const obj: any = {};
+    if (message.depth !== 0) {
+      obj.depth = message.depth;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<depth>, I>>(base?: I): depth {
+    return depth.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<depth>, I>>(object: I): depth {
+    const message = createBasedepth();
+    message.depth = object.depth ?? 0;
+    return message;
+  },
+};
+
+function createBasePositionEstimate(): PositionEstimate {
+  return { local: undefined, global: undefined, timestamp: 0 };
+}
+
+export const PositionEstimate: MessageFns<PositionEstimate> = {
+  encode(message: PositionEstimate, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.local !== undefined) {
+      PositionEstimate_State.encode(message.local, writer.uint32(10).fork()).join();
+    }
+    if (message.global !== undefined) {
+      PositionEstimate_GlobalPosition.encode(message.global, writer.uint32(18).fork()).join();
+    }
+    if (message.timestamp !== 0) {
+      writer.uint32(25).double(message.timestamp);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PositionEstimate {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePositionEstimate();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.local = PositionEstimate_State.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.global = PositionEstimate_GlobalPosition.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.timestamp = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PositionEstimate {
+    return {
+      local: isSet(object.local) ? PositionEstimate_State.fromJSON(object.local) : undefined,
+      global: isSet(object.global) ? PositionEstimate_GlobalPosition.fromJSON(object.global) : undefined,
+      timestamp: isSet(object.timestamp) ? globalThis.Number(object.timestamp) : 0,
+    };
+  },
+
+  toJSON(message: PositionEstimate): unknown {
+    const obj: any = {};
+    if (message.local !== undefined) {
+      obj.local = PositionEstimate_State.toJSON(message.local);
+    }
+    if (message.global !== undefined) {
+      obj.global = PositionEstimate_GlobalPosition.toJSON(message.global);
+    }
+    if (message.timestamp !== 0) {
+      obj.timestamp = message.timestamp;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PositionEstimate>, I>>(base?: I): PositionEstimate {
+    return PositionEstimate.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PositionEstimate>, I>>(object: I): PositionEstimate {
+    const message = createBasePositionEstimate();
+    message.local = (object.local !== undefined && object.local !== null)
+      ? PositionEstimate_State.fromPartial(object.local)
+      : undefined;
+    message.global = (object.global !== undefined && object.global !== null)
+      ? PositionEstimate_GlobalPosition.fromPartial(object.global)
+      : undefined;
+    message.timestamp = object.timestamp ?? 0;
+    return message;
+  },
+};
+
+function createBasePositionEstimate_State(): PositionEstimate_State {
+  return { x: 0, y: 0, z: 0, vx: 0, vy: 0 };
+}
+
+export const PositionEstimate_State: MessageFns<PositionEstimate_State> = {
+  encode(message: PositionEstimate_State, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.x !== 0) {
+      writer.uint32(9).double(message.x);
+    }
+    if (message.y !== 0) {
+      writer.uint32(17).double(message.y);
+    }
+    if (message.z !== 0) {
+      writer.uint32(25).double(message.z);
+    }
+    if (message.vx !== 0) {
+      writer.uint32(33).double(message.vx);
+    }
+    if (message.vy !== 0) {
+      writer.uint32(41).double(message.vy);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PositionEstimate_State {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePositionEstimate_State();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.x = reader.double();
+          continue;
+        case 2:
+          if (tag !== 17) {
+            break;
+          }
+
+          message.y = reader.double();
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.z = reader.double();
+          continue;
+        case 4:
+          if (tag !== 33) {
+            break;
+          }
+
+          message.vx = reader.double();
+          continue;
+        case 5:
+          if (tag !== 41) {
+            break;
+          }
+
+          message.vy = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PositionEstimate_State {
+    return {
+      x: isSet(object.x) ? globalThis.Number(object.x) : 0,
+      y: isSet(object.y) ? globalThis.Number(object.y) : 0,
+      z: isSet(object.z) ? globalThis.Number(object.z) : 0,
+      vx: isSet(object.vx) ? globalThis.Number(object.vx) : 0,
+      vy: isSet(object.vy) ? globalThis.Number(object.vy) : 0,
+    };
+  },
+
+  toJSON(message: PositionEstimate_State): unknown {
+    const obj: any = {};
+    if (message.x !== 0) {
+      obj.x = message.x;
+    }
+    if (message.y !== 0) {
+      obj.y = message.y;
+    }
+    if (message.z !== 0) {
+      obj.z = message.z;
+    }
+    if (message.vx !== 0) {
+      obj.vx = message.vx;
+    }
+    if (message.vy !== 0) {
+      obj.vy = message.vy;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PositionEstimate_State>, I>>(base?: I): PositionEstimate_State {
+    return PositionEstimate_State.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PositionEstimate_State>, I>>(object: I): PositionEstimate_State {
+    const message = createBasePositionEstimate_State();
+    message.x = object.x ?? 0;
+    message.y = object.y ?? 0;
+    message.z = object.z ?? 0;
+    message.vx = object.vx ?? 0;
+    message.vy = object.vy ?? 0;
+    return message;
+  },
+};
+
+function createBasePositionEstimate_GlobalPosition(): PositionEstimate_GlobalPosition {
+  return { latitude: 0, longitude: 0, altitude: 0 };
+}
+
+export const PositionEstimate_GlobalPosition: MessageFns<PositionEstimate_GlobalPosition> = {
+  encode(message: PositionEstimate_GlobalPosition, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.latitude !== 0) {
+      writer.uint32(9).double(message.latitude);
+    }
+    if (message.longitude !== 0) {
+      writer.uint32(17).double(message.longitude);
+    }
+    if (message.altitude !== 0) {
+      writer.uint32(25).double(message.altitude);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): PositionEstimate_GlobalPosition {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasePositionEstimate_GlobalPosition();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.latitude = reader.double();
+          continue;
+        case 2:
+          if (tag !== 17) {
+            break;
+          }
+
+          message.longitude = reader.double();
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.altitude = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): PositionEstimate_GlobalPosition {
+    return {
+      latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
+      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
+      altitude: isSet(object.altitude) ? globalThis.Number(object.altitude) : 0,
+    };
+  },
+
+  toJSON(message: PositionEstimate_GlobalPosition): unknown {
+    const obj: any = {};
+    if (message.latitude !== 0) {
+      obj.latitude = message.latitude;
+    }
+    if (message.longitude !== 0) {
+      obj.longitude = message.longitude;
+    }
+    if (message.altitude !== 0) {
+      obj.altitude = message.altitude;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<PositionEstimate_GlobalPosition>, I>>(base?: I): PositionEstimate_GlobalPosition {
+    return PositionEstimate_GlobalPosition.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<PositionEstimate_GlobalPosition>, I>>(
+    object: I,
+  ): PositionEstimate_GlobalPosition {
+    const message = createBasePositionEstimate_GlobalPosition();
+    message.latitude = object.latitude ?? 0;
+    message.longitude = object.longitude ?? 0;
+    message.altitude = object.altitude ?? 0;
     return message;
   },
 };
