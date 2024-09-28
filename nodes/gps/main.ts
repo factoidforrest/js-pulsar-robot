@@ -139,7 +139,7 @@ class GPSNode {
 async function main() {
 	console.log('Initializing GPS node');
 	const node = await Node.create({name: 'gps', rate: Infinity});
-	const gpsTopicPublisher = await node.createTopicPublisher('auv.position.gps', gpsData);
+	const gpsTopicPublisher = await node.createTopicPublisher('auv.hardware.gps', gpsData);
 
 	// Initialize GPS
 	new GPSNode(node, gpsTopicPublisher);

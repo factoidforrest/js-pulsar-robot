@@ -14,10 +14,10 @@ async function main() {
       name: 'position',
   });
 
-  const imuTopic = await node.createTopicSubscriber('imu_data', imuData);
-  const gpsTopic = await node.createTopicSubscriber('gps_data', gpsData);
-  const speedTopic = await node.createTopicSubscriber('speed_estimate', speedEstimate);
-  const depthTopic = await node.createTopicSubscriber('depth_data', depth); // Assuming depth is published as a number
+  const imuTopic = await node.createTopicSubscriber('auv.hardware.imu', imuData);
+  const gpsTopic = await node.createTopicSubscriber('auv.hardware.gps', gpsData);
+  const speedTopic = await node.createTopicSubscriber('auv.hardware.speed', speedEstimate);
+  const depthTopic = await node.createTopicSubscriber('auv.hardware.depth', depth); 
 
   const positionTopic = await node.createTopicPublisher('position_estimate', positionEstimate);
 
