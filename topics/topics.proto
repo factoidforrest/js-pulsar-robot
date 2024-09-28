@@ -62,8 +62,11 @@ message positionEstimate {
     double x = 1;
     double y = 2;
     double z = 3;
-    double vx = 4;
-    double vy = 5;
+    double v = 4;
+    double qw = 5;
+    double qx = 6;
+    double qy = 7;
+    double qz = 8;
   }
 
   message GlobalPosition {

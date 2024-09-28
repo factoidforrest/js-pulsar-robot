@@ -73,21 +73,24 @@ export interface depth {
   depth: number;
 }
 
-export interface PositionEstimate {
-  local?: PositionEstimate_State | undefined;
-  global?: PositionEstimate_GlobalPosition | undefined;
+export interface positionEstimate {
+  local?: positionEstimate_State | undefined;
+  global?: positionEstimate_GlobalPosition | undefined;
   timestamp: number;
 }
 
-export interface PositionEstimate_State {
+export interface positionEstimate_State {
   x: number;
   y: number;
   z: number;
-  vx: number;
-  vy: number;
+  v: number;
+  qw: number;
+  qx: number;
+  qy: number;
+  qz: number;
 }
 
-export interface PositionEstimate_GlobalPosition {
+export interface positionEstimate_GlobalPosition {
   latitude: number;
   longitude: number;
   altitude: number;
@@ -1028,17 +1031,17 @@ export const depth: MessageFns<depth> = {
   },
 };
 
-function createBasePositionEstimate(): PositionEstimate {
+function createBasepositionEstimate(): positionEstimate {
   return { local: undefined, global: undefined, timestamp: 0 };
 }
 
-export const PositionEstimate: MessageFns<PositionEstimate> = {
-  encode(message: PositionEstimate, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const positionEstimate: MessageFns<positionEstimate> = {
+  encode(message: positionEstimate, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.local !== undefined) {
-      PositionEstimate_State.encode(message.local, writer.uint32(10).fork()).join();
+      positionEstimate_State.encode(message.local, writer.uint32(10).fork()).join();
     }
     if (message.global !== undefined) {
-      PositionEstimate_GlobalPosition.encode(message.global, writer.uint32(18).fork()).join();
+      positionEstimate_GlobalPosition.encode(message.global, writer.uint32(18).fork()).join();
     }
     if (message.timestamp !== 0) {
       writer.uint32(25).double(message.timestamp);
@@ -1046,10 +1049,10 @@ export const PositionEstimate: MessageFns<PositionEstimate> = {
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): PositionEstimate {
+  decode(input: BinaryReader | Uint8Array, length?: number): positionEstimate {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePositionEstimate();
+    const message = createBasepositionEstimate();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1058,14 +1061,14 @@ export const PositionEstimate: MessageFns<PositionEstimate> = {
             break;
           }
 
-          message.local = PositionEstimate_State.decode(reader, reader.uint32());
+          message.local = positionEstimate_State.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.global = PositionEstimate_GlobalPosition.decode(reader, reader.uint32());
+          message.global = positionEstimate_GlobalPosition.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 25) {
@@ -1083,21 +1086,21 @@ export const PositionEstimate: MessageFns<PositionEstimate> = {
     return message;
   },
 
-  fromJSON(object: any): PositionEstimate {
+  fromJSON(object: any): positionEstimate {
     return {
-      local: isSet(object.local) ? PositionEstimate_State.fromJSON(object.local) : undefined,
-      global: isSet(object.global) ? PositionEstimate_GlobalPosition.fromJSON(object.global) : undefined,
+      local: isSet(object.local) ? positionEstimate_State.fromJSON(object.local) : undefined,
+      global: isSet(object.global) ? positionEstimate_GlobalPosition.fromJSON(object.global) : undefined,
       timestamp: isSet(object.timestamp) ? globalThis.Number(object.timestamp) : 0,
     };
   },
 
-  toJSON(message: PositionEstimate): unknown {
+  toJSON(message: positionEstimate): unknown {
     const obj: any = {};
     if (message.local !== undefined) {
-      obj.local = PositionEstimate_State.toJSON(message.local);
+      obj.local = positionEstimate_State.toJSON(message.local);
     }
     if (message.global !== undefined) {
-      obj.global = PositionEstimate_GlobalPosition.toJSON(message.global);
+      obj.global = positionEstimate_GlobalPosition.toJSON(message.global);
     }
     if (message.timestamp !== 0) {
       obj.timestamp = message.timestamp;
@@ -1105,28 +1108,28 @@ export const PositionEstimate: MessageFns<PositionEstimate> = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<PositionEstimate>, I>>(base?: I): PositionEstimate {
-    return PositionEstimate.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<positionEstimate>, I>>(base?: I): positionEstimate {
+    return positionEstimate.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<PositionEstimate>, I>>(object: I): PositionEstimate {
-    const message = createBasePositionEstimate();
+  fromPartial<I extends Exact<DeepPartial<positionEstimate>, I>>(object: I): positionEstimate {
+    const message = createBasepositionEstimate();
     message.local = (object.local !== undefined && object.local !== null)
-      ? PositionEstimate_State.fromPartial(object.local)
+      ? positionEstimate_State.fromPartial(object.local)
       : undefined;
     message.global = (object.global !== undefined && object.global !== null)
-      ? PositionEstimate_GlobalPosition.fromPartial(object.global)
+      ? positionEstimate_GlobalPosition.fromPartial(object.global)
       : undefined;
     message.timestamp = object.timestamp ?? 0;
     return message;
   },
 };
 
-function createBasePositionEstimate_State(): PositionEstimate_State {
-  return { x: 0, y: 0, z: 0, vx: 0, vy: 0 };
+function createBasepositionEstimate_State(): positionEstimate_State {
+  return { x: 0, y: 0, z: 0, v: 0, qw: 0, qx: 0, qy: 0, qz: 0 };
 }
 
-export const PositionEstimate_State: MessageFns<PositionEstimate_State> = {
-  encode(message: PositionEstimate_State, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const positionEstimate_State: MessageFns<positionEstimate_State> = {
+  encode(message: positionEstimate_State, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.x !== 0) {
       writer.uint32(9).double(message.x);
     }
@@ -1136,19 +1139,28 @@ export const PositionEstimate_State: MessageFns<PositionEstimate_State> = {
     if (message.z !== 0) {
       writer.uint32(25).double(message.z);
     }
-    if (message.vx !== 0) {
-      writer.uint32(33).double(message.vx);
+    if (message.v !== 0) {
+      writer.uint32(33).double(message.v);
     }
-    if (message.vy !== 0) {
-      writer.uint32(41).double(message.vy);
+    if (message.qw !== 0) {
+      writer.uint32(41).double(message.qw);
+    }
+    if (message.qx !== 0) {
+      writer.uint32(49).double(message.qx);
+    }
+    if (message.qy !== 0) {
+      writer.uint32(57).double(message.qy);
+    }
+    if (message.qz !== 0) {
+      writer.uint32(65).double(message.qz);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): PositionEstimate_State {
+  decode(input: BinaryReader | Uint8Array, length?: number): positionEstimate_State {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePositionEstimate_State();
+    const message = createBasepositionEstimate_State();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1178,14 +1190,35 @@ export const PositionEstimate_State: MessageFns<PositionEstimate_State> = {
             break;
           }
 
-          message.vx = reader.double();
+          message.v = reader.double();
           continue;
         case 5:
           if (tag !== 41) {
             break;
           }
 
-          message.vy = reader.double();
+          message.qw = reader.double();
+          continue;
+        case 6:
+          if (tag !== 49) {
+            break;
+          }
+
+          message.qx = reader.double();
+          continue;
+        case 7:
+          if (tag !== 57) {
+            break;
+          }
+
+          message.qy = reader.double();
+          continue;
+        case 8:
+          if (tag !== 65) {
+            break;
+          }
+
+          message.qz = reader.double();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1196,17 +1229,20 @@ export const PositionEstimate_State: MessageFns<PositionEstimate_State> = {
     return message;
   },
 
-  fromJSON(object: any): PositionEstimate_State {
+  fromJSON(object: any): positionEstimate_State {
     return {
       x: isSet(object.x) ? globalThis.Number(object.x) : 0,
       y: isSet(object.y) ? globalThis.Number(object.y) : 0,
       z: isSet(object.z) ? globalThis.Number(object.z) : 0,
-      vx: isSet(object.vx) ? globalThis.Number(object.vx) : 0,
-      vy: isSet(object.vy) ? globalThis.Number(object.vy) : 0,
+      v: isSet(object.v) ? globalThis.Number(object.v) : 0,
+      qw: isSet(object.qw) ? globalThis.Number(object.qw) : 0,
+      qx: isSet(object.qx) ? globalThis.Number(object.qx) : 0,
+      qy: isSet(object.qy) ? globalThis.Number(object.qy) : 0,
+      qz: isSet(object.qz) ? globalThis.Number(object.qz) : 0,
     };
   },
 
-  toJSON(message: PositionEstimate_State): unknown {
+  toJSON(message: positionEstimate_State): unknown {
     const obj: any = {};
     if (message.x !== 0) {
       obj.x = message.x;
@@ -1217,35 +1253,47 @@ export const PositionEstimate_State: MessageFns<PositionEstimate_State> = {
     if (message.z !== 0) {
       obj.z = message.z;
     }
-    if (message.vx !== 0) {
-      obj.vx = message.vx;
+    if (message.v !== 0) {
+      obj.v = message.v;
     }
-    if (message.vy !== 0) {
-      obj.vy = message.vy;
+    if (message.qw !== 0) {
+      obj.qw = message.qw;
+    }
+    if (message.qx !== 0) {
+      obj.qx = message.qx;
+    }
+    if (message.qy !== 0) {
+      obj.qy = message.qy;
+    }
+    if (message.qz !== 0) {
+      obj.qz = message.qz;
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<PositionEstimate_State>, I>>(base?: I): PositionEstimate_State {
-    return PositionEstimate_State.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<positionEstimate_State>, I>>(base?: I): positionEstimate_State {
+    return positionEstimate_State.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<PositionEstimate_State>, I>>(object: I): PositionEstimate_State {
-    const message = createBasePositionEstimate_State();
+  fromPartial<I extends Exact<DeepPartial<positionEstimate_State>, I>>(object: I): positionEstimate_State {
+    const message = createBasepositionEstimate_State();
     message.x = object.x ?? 0;
     message.y = object.y ?? 0;
     message.z = object.z ?? 0;
-    message.vx = object.vx ?? 0;
-    message.vy = object.vy ?? 0;
+    message.v = object.v ?? 0;
+    message.qw = object.qw ?? 0;
+    message.qx = object.qx ?? 0;
+    message.qy = object.qy ?? 0;
+    message.qz = object.qz ?? 0;
     return message;
   },
 };
 
-function createBasePositionEstimate_GlobalPosition(): PositionEstimate_GlobalPosition {
+function createBasepositionEstimate_GlobalPosition(): positionEstimate_GlobalPosition {
   return { latitude: 0, longitude: 0, altitude: 0 };
 }
 
-export const PositionEstimate_GlobalPosition: MessageFns<PositionEstimate_GlobalPosition> = {
-  encode(message: PositionEstimate_GlobalPosition, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const positionEstimate_GlobalPosition: MessageFns<positionEstimate_GlobalPosition> = {
+  encode(message: positionEstimate_GlobalPosition, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.latitude !== 0) {
       writer.uint32(9).double(message.latitude);
     }
@@ -1258,10 +1306,10 @@ export const PositionEstimate_GlobalPosition: MessageFns<PositionEstimate_Global
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): PositionEstimate_GlobalPosition {
+  decode(input: BinaryReader | Uint8Array, length?: number): positionEstimate_GlobalPosition {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasePositionEstimate_GlobalPosition();
+    const message = createBasepositionEstimate_GlobalPosition();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1295,7 +1343,7 @@ export const PositionEstimate_GlobalPosition: MessageFns<PositionEstimate_Global
     return message;
   },
 
-  fromJSON(object: any): PositionEstimate_GlobalPosition {
+  fromJSON(object: any): positionEstimate_GlobalPosition {
     return {
       latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
       longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
@@ -1303,7 +1351,7 @@ export const PositionEstimate_GlobalPosition: MessageFns<PositionEstimate_Global
     };
   },
 
-  toJSON(message: PositionEstimate_GlobalPosition): unknown {
+  toJSON(message: positionEstimate_GlobalPosition): unknown {
     const obj: any = {};
     if (message.latitude !== 0) {
       obj.latitude = message.latitude;
@@ -1317,13 +1365,13 @@ export const PositionEstimate_GlobalPosition: MessageFns<PositionEstimate_Global
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<PositionEstimate_GlobalPosition>, I>>(base?: I): PositionEstimate_GlobalPosition {
-    return PositionEstimate_GlobalPosition.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<positionEstimate_GlobalPosition>, I>>(base?: I): positionEstimate_GlobalPosition {
+    return positionEstimate_GlobalPosition.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<PositionEstimate_GlobalPosition>, I>>(
+  fromPartial<I extends Exact<DeepPartial<positionEstimate_GlobalPosition>, I>>(
     object: I,
-  ): PositionEstimate_GlobalPosition {
-    const message = createBasePositionEstimate_GlobalPosition();
+  ): positionEstimate_GlobalPosition {
+    const message = createBasepositionEstimate_GlobalPosition();
     message.latitude = object.latitude ?? 0;
     message.longitude = object.longitude ?? 0;
     message.altitude = object.altitude ?? 0;
