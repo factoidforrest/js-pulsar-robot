@@ -4,7 +4,7 @@ import {type MessageFns} from '../topics/generated/topics/topics.js';
 
 export type NodeConfig = {
 	natsServers?: string | string[];
-	rate: number;
+	rate?: number;
 	name: string;
 	// Add other configuration options as needed
 };
@@ -55,6 +55,9 @@ export class Node {
 	}
 
 	async loop(loopFunction: () => Promise<void>) {
+		if (!this.config.rate) {
+			throw new Error('Rate not set, node shouldnt be calling loop without setting a rate');
+		}
 		const intervalMs = 1000 / this.config.rate;
 		while (true) {
 			const startTime = Date.now();

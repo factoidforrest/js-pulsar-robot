@@ -11,11 +11,8 @@ interface PositionEstimate {
 async function main() {
   console.log('Initializing EKF Position Estimator node');
   const node = await Node.create({
-      name: 'ekf-position-estimator',
-      rate: 10, // Update at 10 Hz
+      name: 'position',
   });
-
-  const ekf = new EKFPositionEstimator();
 
   const imuTopic = await node.createTopicSubscriber('imu_data', imuData);
   const gpsTopic = await node.createTopicSubscriber('gps_data', gpsData);
@@ -24,47 +21,57 @@ async function main() {
 
   const positionTopic = await node.createTopicPublisher('position_estimate', positionEstimate);
 
-  let lastTimestamp: number | null = null;
-
-  await node.loop(async () => {
-      const currentTime = Date.now() / 1000; // Convert to seconds
-      if (lastTimestamp !== null) {
-          const dt = currentTime - lastTimestamp;
-
-          imuTopic.on('message', (msg) => {
-            ekf.predict(dt, msg.orientation!);
-          })
-
-          gpsTopic.on('message', (msg) => {
-            ekf.updateGPS( msg);
-          })
-
-
-          speedTopic.on('message', (msg) => {
-            ekf.updateSpeed(msg.speed);
-          })
-
-
-          depthTopic.on('message', (msg) => {
-            ekf.updateDepth(msg.depth);
-          })
-
-          // Get the current state estimate
-          const state = ekf.getState();
-          const globalPosition = ekf.getGlobalPosition();
-
-          // Publish the position estimate
-          const positionEstimate: PositionEstimate = {
-              local: state,
-              global: globalPosition,
-              timestamp: currentTime
-          };
-
-          await positionTopic.sendMsg(positionEstimate);
+  // Wait for first fix before starting position estimating
+  const firstFix = new Promise<gpsData>((resolve, reject) => {
+    const fixListener = (msg: gpsData) => {
+      const goodFix = EKFPositionEstimator.fixSufficient(msg);
+      if (!goodFix) {
+        console.log('Waiting for good GPS fix...');
+        return;
       }
+      // stop listening, we got what we were waiting for
+      gpsTopic.off('message', fixListener);
+      resolve(msg);
+    }
+    gpsTopic.on('message', fixListener);
+    console.log('waiting for good GPS fix to begin position estimation')
+  })
 
-      lastTimestamp = currentTime;
-  });
+  const ekf = new EKFPositionEstimator(await firstFix)
+
+  // When IMU comes in, we run "predict" which advances time in the EKF, and then emit a new estimate
+  imuTopic.on('message', (msg) => {
+    ekf.predict(msg);
+    // Get the current state estimate
+    const state = ekf.getState();
+    const globalPosition = ekf.getGlobalPosition();
+
+    // Publish the position estimate
+    const positionEstimate: PositionEstimate = {
+        local: state,
+        global: globalPosition,
+        timestamp: Date.now()
+    };
+
+    positionTopic.sendMsg(positionEstimate);
+  })
+  
+  // The rest of these messages are "updates" which adjust the EKF's state estimate but dont advance time or emit any predictions
+  gpsTopic.on('message', (msg) => {
+    ekf.updateGPS( msg);
+  })
+
+  speedTopic.on('message', (msg) => {
+    ekf.updateVelocity(msg.speed);
+  })
+
+
+  depthTopic.on('message', (msg) => {
+    ekf.updateDepth(msg.depth);
+  })
+
+  
+  
 }
 
 main().catch((error) => {
