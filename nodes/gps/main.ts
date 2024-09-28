@@ -57,6 +57,7 @@ class GPSNode {
 		});
 	}
 
+	// this is the main fix, so we only publish on this one.
 	private handleGGA(data: GGASentence) {
 		this.gpsData.timestamp = data.time?.getTime() || undefined;
 		this.gpsData.latitude = data.lat;
@@ -64,27 +65,26 @@ class GPSNode {
 		this.gpsData.altitude = data.alt;
 		this.gpsData.satellites = data.satellites;
 		this.gpsData.dgps = data.quality === 2;
-		// this.updateLinkQuality(data.quality);
 		this.setSystemTime(data.time);
 		this.publishGPSData();
 	}
 
 	private handleRMC(data: RMCSentence) {
-		this.gpsData.timestamp = data.time?.getTime() || undefined;
-		this.gpsData.latitude = data.lat;
-		this.gpsData.longitude = data.lon;
+		// this.gpsData.timestamp = data.time?.getTime() || undefined;
+		// this.gpsData.latitude = data.lat;
+		// this.gpsData.longitude = data.lon;
 		this.gpsData.speed = data.speed;
 		this.gpsData.course = data.track;
 
 		this.setSystemTime(data.time);
-		this.publishGPSData();
+		// this.publishGPSData();
 	}
 
 	private handleGSA(data: GSASentence) {
 		this.gpsData.fix = data.fix;
 		this.gpsData.pdop = data.pdop;
 		this.gpsData.linkQuality = this.updateLinkQuality(data.pdop);
-		this.publishGPSData();
+		// this.publishGPSData();
 	}
 
 	private handleGSV(data: GSVSentence) {
@@ -94,7 +94,7 @@ class GPSNode {
 	private handleVTG(data: VTGSentence) {
 		this.gpsData.speed = data.speed;
 		this.gpsData.course = data.track;
-		this.publishGPSData();
+		// this.publishGPSData();
 	}
 
 	private updateLinkQuality(pdop: number | undefined) {
