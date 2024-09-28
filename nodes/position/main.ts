@@ -59,7 +59,7 @@ async function main() {
   // The rest of these messages are "updates" which adjust the EKF's state estimate but dont advance time or emit any predictions
   gpsTopic.on('message', (msg) => {
     ekf.updateGPS( msg);
-    console.log('GPS update')
+    console.log('GPS update!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
   })
 
   speedTopic.on('message', (msg) => {
