@@ -347,14 +347,18 @@ export class EKFPositionEstimator {
     }
 
     // Matrix operations
-
     private matrixMultiply(a: number[][], b: number[][]): number[][] {
+        // Ensure the matrices can be multiplied: columns of 'a' must equal rows of 'b'
+        if (a[0].length !== b.length) {
+            throw new Error('Number of columns in matrix A must match the number of rows in matrix B');
+        }
+    
         const result: number[][] = [];
         for (let i = 0; i < a.length; i++) {
             result[i] = [];
             for (let j = 0; j < b[0].length; j++) {
                 let sum = 0;
-                for (let k = 0; k < a[i].length; k++) {
+                for (let k = 0; k < a[0].length; k++) {
                     console.log('ai is ', a[i], 'and bk is', b[k], `at indexes i${i}, k${k}, and j${j}`)
                     sum += a[i][k] * b[k][j];
                 }
