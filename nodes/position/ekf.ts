@@ -184,7 +184,7 @@ export class EKFPositionEstimator {
         // Note: We can now pass innovation directly without modifying it
         const stateUpdate = this.matrixMultiply(K, innovation);
         
-        console.log('Before update:', this.state);
+        console.log('Before update:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', this.state);
         console.log('State update:', stateUpdate);
 
         
@@ -205,7 +205,7 @@ export class EKFPositionEstimator {
         
         console.log('After update:', this.state);
 
-        
+
         this.normalizeQuaternion();
     
         const I = this.identityMatrix(8);
