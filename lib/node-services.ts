@@ -125,13 +125,18 @@ export class TopicSubscriber<T> extends EventEmitter {
 				return;
 			}
 
+			let decodedMessage: T;
 			try {
-				const decodedMessage = this.serializer.decode(message.data);
-				this.emit('message', decodedMessage);
+				decodedMessage = this.serializer.decode(message.data);
 			} catch (error) {
+				//TODO: It seems like this is catch all error types even from handlers
 				console.error('Error decoding message:',this.topicName, message, error);
 				this.emit('error', error as Error);
+				return;
 			}
+
+			this.emit('message', decodedMessage);
+
 		};
 	}
 
