@@ -40,17 +40,20 @@ async function main() {
   let imuWaitCount = 0;
   // also wait for IMU calibrated
   const imuCalibrated = new Promise<void>((res, rej) => {
-    imuTopic.on('message', (msg) => {
+    const imuListener = (msg: imuData) => {
       if (msg.calibrationStatus?.sys !== 3) {
         //quieter logging
         imuWaitCount++;
         if (imuWaitCount % 100 === 0) {
-          console.log('waiting for IMU calibration')
+          console.log('waiting for IMU calibration: ', msg.calibrationStatus)
         }
         return
       }
+      imuTopic.off('message', imuListener);
       res()
-    })
+    }
+    imuTopic.on('message', imuListener);
+    console.log('Waiting for good IMU calibration to begin position estimation')
   })
 
   await imuCalibrated;
