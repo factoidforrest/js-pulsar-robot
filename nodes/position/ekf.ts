@@ -177,6 +177,7 @@ export class EKFPositionEstimator {
     }
 
     private updateState(H: number[][], innovation: number[], R: number[][]) {
+        console.log('updating state', arguments)
         const S = this.matrixAdd(
             this.matrixMultiply(this.matrixMultiply(H, this.covariance), this.transposeMatrix(H)),
             R
