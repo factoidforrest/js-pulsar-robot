@@ -115,7 +115,7 @@ export class EKFPositionEstimator {
     }
 
     updateGPS(gps: gpsData) {
-        if (gps.fix !== 'excellent' && gps.fix !== 'good') return;
+        if (gps.linkQuality !== 'excellent' && gps.linkQuality !== 'good') return;
 
 
         const [x, y] = this.gpsToLocal(gps.latitude!, gps.longitude!);

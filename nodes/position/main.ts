@@ -37,7 +37,27 @@ async function main() {
     console.log('waiting for good GPS fix to begin position estimation')
   })
 
+  let imuWaitCount = 0;
+  // also wait for IMU calibrated
+  const imuCalibrated = new Promise<void>((res, rej) => {
+    imuTopic.on('message', (msg) => {
+      if (msg.calibrationStatus?.sys !== 3) {
+        //quieter logging
+        imuWaitCount++;
+        if (imuWaitCount % 100 === 0) {
+          console.log('waiting for IMU calibration')
+        }
+        return
+      }
+      res()
+    })
+  })
+
+  await imuCalibrated;
+
   const ekf = new EKFPositionEstimator(await firstFix)
+
+
 
   // When IMU comes in, we run "predict" which advances time in the EKF, and then emit a new estimate
   imuTopic.on('message', (msg) => {
@@ -59,7 +79,6 @@ async function main() {
   // The rest of these messages are "updates" which adjust the EKF's state estimate but dont advance time or emit any predictions
   gpsTopic.on('message', (msg) => {
     ekf.updateGPS( msg);
-    console.log('GPS update!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
   })
 
   speedTopic.on('message', (msg) => {
