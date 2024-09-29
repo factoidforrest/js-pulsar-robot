@@ -24,6 +24,7 @@ async function main() {
   // Wait for first fix before starting position estimating
   const firstFix = new Promise<gpsData>((resolve, reject) => {
     const fixListener = (msg: gpsData) => {
+      console.log('gps msg received')
       const goodFix = EKFPositionEstimator.fixSufficient(msg);
       if (!goodFix) {
         console.log('Waiting for good GPS fix...');
@@ -41,6 +42,7 @@ async function main() {
   // also wait for IMU calibrated
   const imuCalibrated = new Promise<void>((res, rej) => {
     const imuListener = (msg: imuData) => {
+      console.log('imu message received', msg)
       if (msg.calibrationStatus?.sys !== 3) {
         //quieter logging
         imuWaitCount++;
