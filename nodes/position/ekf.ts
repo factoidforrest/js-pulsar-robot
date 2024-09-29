@@ -186,7 +186,7 @@ export class EKFPositionEstimator {
             this.matrixMultiply(this.covariance, this.transposeMatrix(H)),
             this.inverseMatrix(S)
         );
-
+        console.log('calculating state update')
         const stateUpdate = this.matrixMultiply(K, [innovation]);
         this.state.x += stateUpdate[0][0];
         this.state.y += stateUpdate[1][0];
@@ -200,6 +200,7 @@ export class EKFPositionEstimator {
         this.normalizeQuaternion();
 
         const I = this.identityMatrix(8);
+        console.log('calculating covariance')
         this.covariance = this.matrixMultiply(
             this.matrixSubtract(I, this.matrixMultiply(K, H)),
             this.covariance
@@ -359,7 +360,7 @@ export class EKFPositionEstimator {
             for (let j = 0; j < b[0].length; j++) {
                 let sum = 0;
                 for (let k = 0; k < a[0].length; k++) {
-                    console.log('ai is ', a[i], 'and bk is', b[k], `at indexes i${i}, k${k}, and j${j}`)
+                    // console.log('ai is ', a[i], 'and bk is', b[k], `at indexes i${i}, k${k}, and j${j}`)
                     sum += a[i][k] * b[k][j];
                 }
                 result[i][j] = sum;
