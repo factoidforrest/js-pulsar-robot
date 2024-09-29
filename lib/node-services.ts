@@ -144,6 +144,7 @@ export class TopicSubscriber<T> extends EventEmitter {
 		event: K,
 		listener: TopicConsumerEvents<T>[K],
 	): this {
+		console.log('Registered message listener ', this.topicName, this.subscriptionName)
 		return super.on(event, listener);
 	}
 
