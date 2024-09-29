@@ -110,7 +110,7 @@ export class EKFPositionEstimator {
     }
 
     updateGPS(gps: gpsData) {
-        if (gps.linkQuality !== 'excellent' && gps.linkQuality !== 'good') return;
+        if (gps.linkQuality !== 'excellent' && gps.linkQuality !== 'good' && gps.linkQuality !== 'moderate')  return;
 
 
         const [x, y] = this.gpsToLocal(gps.latitude!, gps.longitude!);
@@ -192,11 +192,10 @@ export class EKFPositionEstimator {
         this.state.x += stateUpdate[0][0];
         this.state.y += stateUpdate[1][0];
         this.state.z += stateUpdate[2][0];
-
-        if (Math.abs(stateUpdate[3][0]) > 1e-10) {
-            console.warn('Unexpected velocity update:', stateUpdate[3][0]);
+            // Only update velocity if it's explicitly measured (which GPS doesn't do)
+        if (H.length > 3 && H[3][3] === 1) {
+            this.state.v += stateUpdate[3][0];
         }
-
         this.state.v += stateUpdate[3][0];
         this.state.qw += stateUpdate[4][0];
         this.state.qx += stateUpdate[5][0];
