@@ -115,7 +115,6 @@ export class EKFPositionEstimator {
     }
 
     updateGPS(gps: gpsData) {
-        console.log('updating gps with ', gps)
         if (gps.linkQuality !== 'excellent' && gps.linkQuality !== 'good') return;
 
 
@@ -177,7 +176,6 @@ export class EKFPositionEstimator {
     }
 
     private updateState(H: number[][], innovation: number[], R: number[][]) {
-        console.log('updating state', arguments);
         const S = this.matrixAdd(
             this.matrixMultiply(this.matrixMultiply(H, this.covariance), this.transposeMatrix(H)),
             R
@@ -186,7 +184,6 @@ export class EKFPositionEstimator {
             this.matrixMultiply(this.covariance, this.transposeMatrix(H)),
             this.inverseMatrix(S)
         );
-        console.log('calculating state update');
     
         // Perform the state update calculation
         // Note: We can now pass innovation directly without modifying it
@@ -205,7 +202,6 @@ export class EKFPositionEstimator {
         this.normalizeQuaternion();
     
         const I = this.identityMatrix(8);
-        console.log('calculating covariance');
         this.covariance = this.matrixMultiply(
             this.matrixSubtract(I, this.matrixMultiply(K, H)),
             this.covariance
@@ -353,7 +349,6 @@ export class EKFPositionEstimator {
 
     // Matrix operations
     private matrixMultiply(a: number[][], b: number[][] | number[]): number[][] {
-        console.log('matrix multiplying ', arguments);
         
         // Convert b to 2D array if it's 1D
         const b2D = Array.isArray(b[0]) ? b : b.map(val => [val]);
