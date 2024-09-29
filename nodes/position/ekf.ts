@@ -148,13 +148,13 @@ export class EKFPositionEstimator {
         if (!imu.orientation || !imu.linearAcceleration){
             return;
         }
-        // Update orientation directly
+        // Update orientation directly, no filtering but we have no source of orientation other than the IMU so may as well trust it
         this.state.qw = imu.orientation.w;
         this.state.qx = imu.orientation.x;
         this.state.qy = imu.orientation.y;
         this.state.qz = imu.orientation.z;
 
-    
+        // TODO: Gave up on using accelerometer for velocity entirely, not useful
         // Use linear acceleration to update velocity estimate
         // const R = this.quaternionToRotationMatrix(imu.orientation);
         // const forwardVector = [R[0][0], R[1][0], R[2][0]];
