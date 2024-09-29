@@ -129,7 +129,7 @@ export class TopicSubscriber<T> extends EventEmitter {
 				const decodedMessage = this.serializer.decode(message.data);
 				this.emit('message', decodedMessage);
 			} catch (error) {
-				console.error('Error decoding message:', error);
+				console.error('Error decoding message:',this.topicName, message, error);
 				this.emit('error', error as Error);
 			}
 		};
