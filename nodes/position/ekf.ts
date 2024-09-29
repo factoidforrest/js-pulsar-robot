@@ -177,7 +177,7 @@ export class EKFPositionEstimator {
     }
 
     private updateState(H: number[][], innovation: number[], R: number[][]) {
-        console.log('updating state', arguments)
+        console.log('updating state', arguments);
         const S = this.matrixAdd(
             this.matrixMultiply(this.matrixMultiply(H, this.covariance), this.transposeMatrix(H)),
             R
@@ -186,8 +186,17 @@ export class EKFPositionEstimator {
             this.matrixMultiply(this.covariance, this.transposeMatrix(H)),
             this.inverseMatrix(S)
         );
-        console.log('calculating state update')
-        const stateUpdate = this.matrixMultiply(K, [innovation]);
+        console.log('calculating state update');
+    
+        // Create a full-sized innovation vector thats got zeroes in case we dont fill it or use everything
+        const fullInnovation = new Array(8).fill(0);
+        for (let i = 0; i < innovation.length; i++) {
+            fullInnovation[i] = innovation[i];
+        }
+    
+        const stateUpdate = this.matrixMultiply(K, [fullInnovation]);
+        
+        // Update state
         this.state.x += stateUpdate[0][0];
         this.state.y += stateUpdate[1][0];
         this.state.z += stateUpdate[2][0];
@@ -196,11 +205,11 @@ export class EKFPositionEstimator {
         this.state.qx += stateUpdate[5][0];
         this.state.qy += stateUpdate[6][0];
         this.state.qz += stateUpdate[7][0];
-
+    
         this.normalizeQuaternion();
-
+    
         const I = this.identityMatrix(8);
-        console.log('calculating covariance')
+        console.log('calculating covariance');
         this.covariance = this.matrixMultiply(
             this.matrixSubtract(I, this.matrixMultiply(K, H)),
             this.covariance
