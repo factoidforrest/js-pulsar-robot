@@ -43,7 +43,6 @@ async function main() {
   // also wait for IMU calibrated
   const imuCalibrated = new Promise<void>((res, rej) => {
     const imuListener = (msg: imuData) => {
-      console.log('imu message received', msg)
       if (msg.calibrationStatus?.sys !== 3) {
         //quieter logging
         imuWaitCount++;
