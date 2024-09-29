@@ -188,13 +188,9 @@ export class EKFPositionEstimator {
         );
         console.log('calculating state update');
     
-        // Create a full-sized innovation vector thats got zeroes in case we dont fill it or use everything
-        const fullInnovation = new Array(8).fill(0);
-        for (let i = 0; i < innovation.length; i++) {
-            fullInnovation[i] = innovation[i];
-        }
-    
-        const stateUpdate = this.matrixMultiply(K, [fullInnovation]);
+        // Perform the state update calculation
+        // Note: We can now pass innovation directly without modifying it
+        const stateUpdate = this.matrixMultiply(K, innovation);
         
         // Update state
         this.state.x += stateUpdate[0][0];
@@ -215,7 +211,6 @@ export class EKFPositionEstimator {
             this.covariance
         );
     }
-
     private getStateTransitionJacobian(dt: number, forwardVector: number[], forwardAcc: number): number[][] {
         const F = this.identityMatrix(8);
         // Position update
@@ -357,27 +352,31 @@ export class EKFPositionEstimator {
     }
 
     // Matrix operations
-    private matrixMultiply(a: number[][], b: number[][]): number[][] {
-        console.log('matrix multiplying ', arguments)
+    private matrixMultiply(a: number[][], b: number[][] | number[]): number[][] {
+        console.log('matrix multiplying ', arguments);
+        
+        // Convert b to 2D array if it's 1D
+        const b2D = Array.isArray(b[0]) ? b : b.map(val => [val]);
+        
         // Ensure the matrices can be multiplied: columns of 'a' must equal rows of 'b'
-        if (a[0].length !== b.length) {
+        if (a[0].length !== b2D.length) {
             throw new Error('Number of columns in matrix A must match the number of rows in matrix B');
         }
     
         const result: number[][] = [];
         for (let i = 0; i < a.length; i++) {
             result[i] = [];
-            for (let j = 0; j < b[0].length; j++) {
+            for (let j = 0; j < (b2D[0] as number[][]).length; j++) {
                 let sum = 0;
                 for (let k = 0; k < a[0].length; k++) {
-                    // console.log('ai is ', a[i], 'and bk is', b[k], `at indexes i${i}, k${k}, and j${j}`)
-                    sum += a[i][k] * b[k][j];
+                    sum += a[i][k] * (b2D as number[][])[k][j];
                 }
                 result[i][j] = sum;
             }
         }
         return result;
     }
+    
 
     private vectorSubtract(a: number[], b: number[]): number[] {
         return a.map((val, i) => val - b[i]);
