@@ -358,6 +358,7 @@ export class EKFPositionEstimator {
 
     // Matrix operations
     private matrixMultiply(a: number[][], b: number[][]): number[][] {
+        console.log('matrix multiplying ', arguments)
         // Ensure the matrices can be multiplied: columns of 'a' must equal rows of 'b'
         if (a[0].length !== b.length) {
             throw new Error('Number of columns in matrix A must match the number of rows in matrix B');
