@@ -80,4 +80,3 @@ message positionEstimate {
   double timestamp = 3;
 }
 
-message speed { double speed = 1; }

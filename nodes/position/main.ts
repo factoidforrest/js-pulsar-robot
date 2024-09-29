@@ -16,7 +16,7 @@ async function main() {
 
   const imuTopic = await node.createTopicSubscriber('auv.hardware.imu', imuData);
   const gpsTopic = await node.createTopicSubscriber('auv.hardware.gps', gpsData);
-  const speedTopic = await node.createTopicSubscriber('auv.hardware.speed', speedEstimate);
+  const speedTopic = await node.createTopicSubscriber('auv.position.speed_estimate', speedEstimate);
   const depthTopic = await node.createTopicSubscriber('auv.hardware.depth', depth); 
 
   const positionTopic = await node.createTopicPublisher('auv.position.estimate', positionEstimate);

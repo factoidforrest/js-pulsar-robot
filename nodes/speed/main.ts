@@ -1,11 +1,10 @@
 import {Node} from '../../lib/node-services.js';
-import {speed} from '../../topics/generated/topics/topics.js';
+import {speedEstimate} from '../../topics/generated/topics/topics.js';
 
 async function main() {
   console.log('initializing node');
   const node = await Node.create({rate: 1, name: 'speed'});
-  const topic = await node.createTopicPublisher('auv.position.speed', speed);
-  console.log('created topic');
+  const topic = await node.createTopicPublisher('auv.position.speed_estimate', speedEstimate);
 
   await node.loop(async () => {
     const message = {
