@@ -31,6 +31,7 @@ async function main() {
         return;
       }
       // stop listening, we got what we were waiting for
+      console.log('gps fix ready')
       gpsTopic.off('message', fixListener);
       resolve(msg);
     }
