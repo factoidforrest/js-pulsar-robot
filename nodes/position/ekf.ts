@@ -355,6 +355,7 @@ export class EKFPositionEstimator {
             for (let j = 0; j < b[0].length; j++) {
                 let sum = 0;
                 for (let k = 0; k < a[i].length; k++) {
+                    console.log('ai is ', a[i], 'and bk is', b[k])
                     sum += a[i][k] * b[k][j];
                 }
                 result[i][j] = sum;
