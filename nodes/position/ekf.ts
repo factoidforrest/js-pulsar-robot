@@ -115,6 +115,7 @@ export class EKFPositionEstimator {
     }
 
     updateGPS(gps: gpsData) {
+        console.log('updating gps with ', gps)
         if (gps.linkQuality !== 'excellent' && gps.linkQuality !== 'good') return;
 
 
