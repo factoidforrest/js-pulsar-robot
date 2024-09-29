@@ -56,7 +56,7 @@ async function main() {
     console.log('Waiting for good IMU calibration to begin position estimation')
   })
 
-  await imuCalibrated;
+  const [firstfix, _] = await Promise.all([firstFix, imuCalibrated])
 
   const ekf = new EKFPositionEstimator(await firstFix)
 
