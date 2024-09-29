@@ -79,7 +79,7 @@ export class EKFPositionEstimator {
         const dt = (now - this.lastPrediction) / 1000;
         this.lastPrediction = now;
     
-        if (!imu.orientation || !imu.linearAcceleration) return;
+        if (!imu.orientation) return;
     
         // Update orientation directly from IMU
         this.state.qw = imu.orientation.w;
@@ -91,7 +91,7 @@ export class EKFPositionEstimator {
         const forwardVector = [R[0][0], R[1][0], R[2][0]];
         
    
-        // Update position and velocity
+        // Update position
         this.state.x += this.state.v * forwardVector[0] * dt;
         this.state.y += this.state.v * forwardVector[1] * dt;
         this.state.z += this.state.v * forwardVector[2] * dt;
@@ -140,7 +140,7 @@ export class EKFPositionEstimator {
 
     updateIMU(imu: imuData) {
 
-        if (!imu.orientation || !imu.linearAcceleration){
+        if (!imu.orientation){
             return;
         }
         // Update orientation directly, no filtering but we have no source of orientation other than the IMU so may as well trust it
@@ -188,7 +188,7 @@ export class EKFPositionEstimator {
         this.state.x += stateUpdate[0][0];
         this.state.y += stateUpdate[1][0];
         this.state.z += stateUpdate[2][0];
-        this.state.v += stateUpdate[3][0];
+        // this.state.v += stateUpdate[3][0];
         this.state.qw += stateUpdate[4][0];
         this.state.qx += stateUpdate[5][0];
         this.state.qy += stateUpdate[6][0];
