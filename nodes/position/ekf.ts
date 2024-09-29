@@ -184,26 +184,16 @@ export class EKFPositionEstimator {
         // Note: We can now pass innovation directly without modifying it
         const stateUpdate = this.matrixMultiply(K, innovation);
         
-        console.log('Before update:!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', this.state);
-        console.log('State update:', stateUpdate);
-
         
         // Update state
         this.state.x += stateUpdate[0][0];
         this.state.y += stateUpdate[1][0];
         this.state.z += stateUpdate[2][0];
-            // Only update velocity if it's explicitly measured (which GPS doesn't do)
-        if (H.length > 3 && H[3][3] === 1) {
-            this.state.v += stateUpdate[3][0];
-        }
         this.state.v += stateUpdate[3][0];
         this.state.qw += stateUpdate[4][0];
         this.state.qx += stateUpdate[5][0];
         this.state.qy += stateUpdate[6][0];
         this.state.qz += stateUpdate[7][0];
-        
-        console.log('After update:', this.state);
-
 
         this.normalizeQuaternion();
     

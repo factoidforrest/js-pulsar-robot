@@ -96,6 +96,10 @@ export interface positionEstimate_GlobalPosition {
   altitude: number;
 }
 
+export interface speed {
+  speed: number;
+}
+
 function createBasehelloWorld(): helloWorld {
   return { message: "" };
 }
@@ -1375,6 +1379,63 @@ export const positionEstimate_GlobalPosition: MessageFns<positionEstimate_Global
     message.latitude = object.latitude ?? 0;
     message.longitude = object.longitude ?? 0;
     message.altitude = object.altitude ?? 0;
+    return message;
+  },
+};
+
+function createBasespeed(): speed {
+  return { speed: 0 };
+}
+
+export const speed: MessageFns<speed> = {
+  encode(message: speed, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.speed !== 0) {
+      writer.uint32(9).double(message.speed);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): speed {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasespeed();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.speed = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): speed {
+    return { speed: isSet(object.speed) ? globalThis.Number(object.speed) : 0 };
+  },
+
+  toJSON(message: speed): unknown {
+    const obj: any = {};
+    if (message.speed !== 0) {
+      obj.speed = message.speed;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<speed>, I>>(base?: I): speed {
+    return speed.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<speed>, I>>(object: I): speed {
+    const message = createBasespeed();
+    message.speed = object.speed ?? 0;
     return message;
   },
 };

@@ -13,6 +13,7 @@
     "start:hello-world-consumer": "tsx nodes/hello-world-consumer/hello-world-consumer.ts",
     "start:gps": "tsx nodes/gps/main.ts",
     "start:position": "tsx nodes/position/main.ts",
+    "start:speed": "tsx nodes/speed/main.ts",
     "topics:generate": "protoc --plugin=protoc-gen-ts_proto=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./topics/generated --ts_proto_opt=esModuleInterop=true,forceLong=string,useOptionals=true ./topics/topics.proto",
     "lint": "xo",
     "lint:fix": "xo --fix"
