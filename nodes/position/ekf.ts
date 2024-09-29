@@ -156,16 +156,16 @@ export class EKFPositionEstimator {
 
     
         // Use linear acceleration to update velocity estimate
-        const R = this.quaternionToRotationMatrix(imu.orientation);
-        const forwardVector = [R[0][0], R[1][0], R[2][0]];
-        const forwardAcc = imu.linearAcceleration.x * forwardVector[0] + 
-                           imu.linearAcceleration.y * forwardVector[1] + 
-                           imu.linearAcceleration.z * forwardVector[2];
-
-        const H = [[0, 0, 0, 1, 0, 0, 0, 0]];
-        const innovation = [forwardAcc - this.state.v];
-        const RMatrix = [[this.getIMUMeasurementNoise(imu)]];
-        this.updateState(H, innovation, RMatrix);
+        // const R = this.quaternionToRotationMatrix(imu.orientation);
+        // const forwardVector = [R[0][0], R[1][0], R[2][0]];
+        // const forwardAcc = imu.linearAcceleration.x * forwardVector[0] + 
+        //                    imu.linearAcceleration.y * forwardVector[1] + 
+        //                    imu.linearAcceleration.z * forwardVector[2];
+        // const forwardAcc = imu.linearAcceleration.y;
+        // const H = [[0, 0, 0, 1, 0, 0, 0, 0]];
+        // const innovation = [forwardAcc - this.state.v];
+        // const RMatrix = [[this.getIMUMeasurementNoise(imu)]];
+        // this.updateState(H, innovation, RMatrix);
     }
 
     updateVelocity(speed: number) {
