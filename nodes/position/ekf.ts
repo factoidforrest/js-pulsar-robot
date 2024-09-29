@@ -90,19 +90,14 @@ export class EKFPositionEstimator {
         const R = this.quaternionToRotationMatrix(imu.orientation);
         const forwardVector = [R[0][0], R[1][0], R[2][0]];
         
-        // Project acceleration onto forward direction
-        const forwardAcc = imu.linearAcceleration.x * forwardVector[0] + 
-                           imu.linearAcceleration.y * forwardVector[1] + 
-                           imu.linearAcceleration.z * forwardVector[2];
-    
+   
         // Update position and velocity
         this.state.x += this.state.v * forwardVector[0] * dt;
         this.state.y += this.state.v * forwardVector[1] * dt;
         this.state.z += this.state.v * forwardVector[2] * dt;
-        this.state.v += forwardAcc * dt;
     
         // Jacobian of state transition function
-        const F = this.getStateTransitionJacobian(dt, forwardVector, forwardAcc);
+        const F = this.getStateTransitionJacobian(dt, forwardVector);
     
         // Process noise covariance
         const Q = this.getProcessNoiseMatrix(dt);
@@ -207,17 +202,13 @@ export class EKFPositionEstimator {
             this.covariance
         );
     }
-    private getStateTransitionJacobian(dt: number, forwardVector: number[], forwardAcc: number): number[][] {
+    private getStateTransitionJacobian(dt: number, forwardVector: number[]): number[][] {
         const F = this.identityMatrix(8);
         // Position update
         F[0][3] = forwardVector[0] * dt;
         F[1][3] = forwardVector[1] * dt;
         F[2][3] = forwardVector[2] * dt;
-        // Velocity update
-        F[3][3] = 1;
-        // Acceleration effect on velocity
-        F[3][3] += forwardAcc * dt;
-        // Orientation update is from IMU so we dont touch it here (handled directly by IMU)
+        // Velocity and orientation remain unchanged
         return F;
     }
     
