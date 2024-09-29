@@ -19,7 +19,7 @@ async function main() {
   const speedTopic = await node.createTopicSubscriber('auv.hardware.speed', speedEstimate);
   const depthTopic = await node.createTopicSubscriber('auv.hardware.depth', depth); 
 
-  const positionTopic = await node.createTopicPublisher('position_estimate', positionEstimate);
+  const positionTopic = await node.createTopicPublisher('auv.position.estimate', positionEstimate);
 
   // Wait for first fix before starting position estimating
   const firstFix = new Promise<gpsData>((resolve, reject) => {
@@ -51,6 +51,7 @@ async function main() {
         }
         return
       }
+      console.log('imu calibrated')
       imuTopic.off('message', imuListener);
       res()
     }

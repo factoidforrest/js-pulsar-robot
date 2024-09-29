@@ -32,11 +32,11 @@ export class Node {
 
 	async createTopicPublisher<T>(
 		topicName: string,
-		messageFns: MessageFns<T>,
+		serializer: MessageFns<T>,
 	): Promise<TopicPublisher<T>> {
 		return new TopicPublisher<T>(
 			this.client,
-			messageFns,
+			serializer,
 			topicName,
 			this.config.name,
 		);
@@ -44,11 +44,11 @@ export class Node {
 
 	async createTopicSubscriber<T>(
 		topicName: string,
-		messageFns: MessageFns<T>,
+		serializer: MessageFns<T>,
 	): Promise<TopicSubscriber<T>> {
 		return new TopicSubscriber<T>(
 			this.client,
-			messageFns,
+			serializer,
 			topicName,
 			this.config.name + '-' + 'subscription',
 		);
@@ -76,13 +76,13 @@ export class Node {
 export class TopicPublisher<T> {
 	constructor(
 		private readonly client: Nats.NatsConnection,
-		private readonly messageFns: MessageFns<T>,
+		private readonly serializer: MessageFns<T>,
 		private readonly topicName: string,
 		private readonly nodeName: string,
 	) {}
 
 	async sendMsg(message: T): Promise<void> {
-		const rawMessage = this.messageFns.encode(message).finish();
+		const rawMessage = this.serializer.encode(message).finish();
 		const messageHeaders = Nats.headers();
 		messageHeaders.append('node', this.nodeName);
 		await this.client.publish(this.topicName, rawMessage, {
@@ -107,7 +107,7 @@ export class TopicSubscriber<T> extends EventEmitter {
 
 	constructor(
 		private readonly client: Nats.NatsConnection,
-		private readonly messageFns: MessageFns<T>,
+		private readonly serializer: MessageFns<T>,
 		private readonly topicName: string,
 		private readonly subscriptionName: string,
 	) {
@@ -126,7 +126,7 @@ export class TopicSubscriber<T> extends EventEmitter {
 			}
 
 			try {
-				const decodedMessage = this.messageFns.decode(message.data);
+				const decodedMessage = this.serializer.decode(message.data);
 				this.emit('message', decodedMessage);
 			} catch (error) {
 				console.error('Error decoding message:', error);
