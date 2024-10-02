@@ -96,8 +96,18 @@ export interface positionEstimate_GlobalPosition {
   altitude: number;
 }
 
-export interface speed {
-  speed: number;
+export interface actuatorCommand {
+  yaw: number;
+  pitch: number;
+  roll: number;
+  motor: number;
+}
+
+export interface targetPose {
+  qw: number;
+  qx: number;
+  qy: number;
+  qz: number;
 }
 
 function createBasehelloWorld(): helloWorld {
@@ -1383,22 +1393,31 @@ export const positionEstimate_GlobalPosition: MessageFns<positionEstimate_Global
   },
 };
 
-function createBasespeed(): speed {
-  return { speed: 0 };
+function createBaseactuatorCommand(): actuatorCommand {
+  return { yaw: 0, pitch: 0, roll: 0, motor: 0 };
 }
 
-export const speed: MessageFns<speed> = {
-  encode(message: speed, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.speed !== 0) {
-      writer.uint32(9).double(message.speed);
+export const actuatorCommand: MessageFns<actuatorCommand> = {
+  encode(message: actuatorCommand, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.yaw !== 0) {
+      writer.uint32(9).double(message.yaw);
+    }
+    if (message.pitch !== 0) {
+      writer.uint32(17).double(message.pitch);
+    }
+    if (message.roll !== 0) {
+      writer.uint32(25).double(message.roll);
+    }
+    if (message.motor !== 0) {
+      writer.uint32(41).double(message.motor);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): speed {
+  decode(input: BinaryReader | Uint8Array, length?: number): actuatorCommand {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasespeed();
+    const message = createBaseactuatorCommand();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1407,7 +1426,28 @@ export const speed: MessageFns<speed> = {
             break;
           }
 
-          message.speed = reader.double();
+          message.yaw = reader.double();
+          continue;
+        case 2:
+          if (tag !== 17) {
+            break;
+          }
+
+          message.pitch = reader.double();
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.roll = reader.double();
+          continue;
+        case 5:
+          if (tag !== 41) {
+            break;
+          }
+
+          message.motor = reader.double();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1418,24 +1458,145 @@ export const speed: MessageFns<speed> = {
     return message;
   },
 
-  fromJSON(object: any): speed {
-    return { speed: isSet(object.speed) ? globalThis.Number(object.speed) : 0 };
+  fromJSON(object: any): actuatorCommand {
+    return {
+      yaw: isSet(object.yaw) ? globalThis.Number(object.yaw) : 0,
+      pitch: isSet(object.pitch) ? globalThis.Number(object.pitch) : 0,
+      roll: isSet(object.roll) ? globalThis.Number(object.roll) : 0,
+      motor: isSet(object.motor) ? globalThis.Number(object.motor) : 0,
+    };
   },
 
-  toJSON(message: speed): unknown {
+  toJSON(message: actuatorCommand): unknown {
     const obj: any = {};
-    if (message.speed !== 0) {
-      obj.speed = message.speed;
+    if (message.yaw !== 0) {
+      obj.yaw = message.yaw;
+    }
+    if (message.pitch !== 0) {
+      obj.pitch = message.pitch;
+    }
+    if (message.roll !== 0) {
+      obj.roll = message.roll;
+    }
+    if (message.motor !== 0) {
+      obj.motor = message.motor;
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<speed>, I>>(base?: I): speed {
-    return speed.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<actuatorCommand>, I>>(base?: I): actuatorCommand {
+    return actuatorCommand.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<speed>, I>>(object: I): speed {
-    const message = createBasespeed();
-    message.speed = object.speed ?? 0;
+  fromPartial<I extends Exact<DeepPartial<actuatorCommand>, I>>(object: I): actuatorCommand {
+    const message = createBaseactuatorCommand();
+    message.yaw = object.yaw ?? 0;
+    message.pitch = object.pitch ?? 0;
+    message.roll = object.roll ?? 0;
+    message.motor = object.motor ?? 0;
+    return message;
+  },
+};
+
+function createBasetargetPose(): targetPose {
+  return { qw: 0, qx: 0, qy: 0, qz: 0 };
+}
+
+export const targetPose: MessageFns<targetPose> = {
+  encode(message: targetPose, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.qw !== 0) {
+      writer.uint32(41).double(message.qw);
+    }
+    if (message.qx !== 0) {
+      writer.uint32(49).double(message.qx);
+    }
+    if (message.qy !== 0) {
+      writer.uint32(57).double(message.qy);
+    }
+    if (message.qz !== 0) {
+      writer.uint32(65).double(message.qz);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): targetPose {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasetargetPose();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 5:
+          if (tag !== 41) {
+            break;
+          }
+
+          message.qw = reader.double();
+          continue;
+        case 6:
+          if (tag !== 49) {
+            break;
+          }
+
+          message.qx = reader.double();
+          continue;
+        case 7:
+          if (tag !== 57) {
+            break;
+          }
+
+          message.qy = reader.double();
+          continue;
+        case 8:
+          if (tag !== 65) {
+            break;
+          }
+
+          message.qz = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): targetPose {
+    return {
+      qw: isSet(object.qw) ? globalThis.Number(object.qw) : 0,
+      qx: isSet(object.qx) ? globalThis.Number(object.qx) : 0,
+      qy: isSet(object.qy) ? globalThis.Number(object.qy) : 0,
+      qz: isSet(object.qz) ? globalThis.Number(object.qz) : 0,
+    };
+  },
+
+  toJSON(message: targetPose): unknown {
+    const obj: any = {};
+    if (message.qw !== 0) {
+      obj.qw = message.qw;
+    }
+    if (message.qx !== 0) {
+      obj.qx = message.qx;
+    }
+    if (message.qy !== 0) {
+      obj.qy = message.qy;
+    }
+    if (message.qz !== 0) {
+      obj.qz = message.qz;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<targetPose>, I>>(base?: I): targetPose {
+    return targetPose.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<targetPose>, I>>(object: I): targetPose {
+    const message = createBasetargetPose();
+    message.qw = object.qw ?? 0;
+    message.qx = object.qx ?? 0;
+    message.qy = object.qy ?? 0;
+    message.qz = object.qz ?? 0;
     return message;
   },
 };

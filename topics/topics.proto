@@ -80,3 +80,16 @@ message positionEstimate {
   double timestamp = 3;
 }
 
+message actuatorCommand {
+  double yaw = 1;
+  double pitch = 2;
+  double roll = 3;
+  double motor = 5;
+}
+
+message targetPose {
+  double qw = 5;
+  double qx = 6;
+  double qy = 7;
+  double qz = 8;
+}

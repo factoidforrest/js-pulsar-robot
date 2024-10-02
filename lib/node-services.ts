@@ -30,10 +30,10 @@ export class Node {
 		});
 	}
 
-	async createTopicPublisher<T>(
+	createTopicPublisher<T>(
 		topicName: string,
 		serializer: MessageFns<T>,
-	): Promise<TopicPublisher<T>> {
+	): TopicPublisher<T> {
 		return new TopicPublisher<T>(
 			this.client,
 			serializer,
@@ -42,10 +42,10 @@ export class Node {
 		);
 	}
 
-	async createTopicSubscriber<T>(
+	createTopicSubscriber<T>(
 		topicName: string,
 		serializer: MessageFns<T>,
-	): Promise<TopicSubscriber<T>> {
+	): TopicSubscriber<T> {
 		return new TopicSubscriber<T>(
 			this.client,
 			serializer,
