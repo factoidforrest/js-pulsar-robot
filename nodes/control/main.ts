@@ -143,6 +143,7 @@ class ActuatorNode {
         ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
           this.setFin(fin as Fin, i);
       })
+      this.logI2CRegisters();
       await sleep(10);
     }
   }
