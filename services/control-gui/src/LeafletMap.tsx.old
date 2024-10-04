@@ -1,0 +1,78 @@
+import React, { useEffect, useRef } from 'react';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import '@raruto/leaflet-elevation/dist/leaflet-elevation.css';
+import '@raruto/leaflet-elevation/dist/leaflet-elevation.js';
+
+const LeafletMap = () => {
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Initialize the map
+    const map = L.map(mapRef.current).setView([0, 0], 2);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Add elevation control
+    const elevation = L.control.elevation({
+      position: "topright",
+      theme: "magenta-theme",
+      width: 600,
+      height: 125,
+      margins: {
+        top: 10,
+        right: 20,
+        bottom: 30,
+        left: 50
+      },
+      useHeightIndicator: true,
+      interpolation: "linear",
+      hoverNumber: {
+        decimalsX: 3,
+        decimalsY: 0,
+        formatter: undefined
+      },
+      xTicks: undefined,
+      yTicks: undefined,
+      collapsed: false
+    }).addTo(map);
+
+    // Sample GeoJSON data for elevation (this is just an example, replace with real data)
+    const geojson = {
+      "type": "FeatureCollection",
+      "features": [{
+        "type": "Feature",
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [-118.2, 34.0, 0],
+            [-118.1, 34.1, 100],
+            [-118.0, 34.2, 200],
+            [-117.9, 34.3, 300]
+          ]
+        },
+        "properties": {
+          "name": "Sample Elevation Path"
+        }
+      }]
+    };
+
+    // Add GeoJSON to map and elevation control
+    const geojsonLayer = L.geoJSON(geojson).addTo(map);
+    elevation.addData(geojsonLayer);
+
+    // Clean up on unmount
+    return () => {
+      map.remove();
+    };
+  }, []);
+
+  return <div ref={mapRef} style={{ width: '100%', height: '400px' }} />;
+};
+
+export default LeafletMap;

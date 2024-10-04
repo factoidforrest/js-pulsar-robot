@@ -1,6 +1,6 @@
 import { Node } from '../../lib/node-services.js';
 import { imuData, gpsData, speedEstimate, depth, positionEstimate } from '../../topics/generated/topics/topics.js';
-import {State, EKFPositionEstimator} from './ekf'
+import {State, EKFPositionEstimator} from './ekf.js'
 
 interface PositionEstimate {
   local: State;

@@ -1,4 +1,3 @@
-
 syntax = "proto3";
 
 package topics;
@@ -39,7 +38,6 @@ message Quaternion {
 }
 
 message gpsData {
-
   optional double timestamp = 1;
   optional double latitude = 2;
   optional double longitude = 3;
@@ -92,4 +90,38 @@ message targetPose {
   double qx = 6;
   double qy = 7;
   double qz = 8;
+}
+
+// New messages for navigation and mission planning
+
+message Waypoint {
+  double latitude = 1;
+  double longitude = 2;
+  double depth = 3;    // Depth for underwater navigation
+  double speed = 5;    // Desired speed to approach this waypoint
+  string uuid = 6;
+}
+
+message Mission {
+  double max_duration = 1; // Maximum mission duration in seconds
+  repeated Waypoint waypoints = 2;
+  double default_speed = 3; // Default speed for the mission
+  double max_depth = 4;     // Maximum allowed depth for the mission
+}
+
+message MissionStatus {
+  string mission_id = 1;
+  enum Status {
+    PENDING = 0;
+    IN_PROGRESS = 1;
+    COMPLETED = 2;
+    ABORTED = 3;
+  }
+  Status status = 2;
+  int32 current_waypoint_index = 3;
+  double mission_progress = 4; // Progress as a percentage (0-100)
+  string current_action = 5;
+  repeated string completed_actions = 6;
+  string last_error = 7;
+  double estimated_time_remaining = 8;
 }
