@@ -40,7 +40,7 @@ class ActuatorNode {
     const driverOptions: Pca9685Options = {
       i2c: actuatorNode.i2c,
       address: 0x40,
-      frequency: 50, //todo: Change to 100, just it was 50 by default so make sure it works first
+      frequency: 50, 
       debug: true,
     };
 
@@ -56,17 +56,15 @@ class ActuatorNode {
         });
     });
 
-
-
     // zero everything out to start. Should make ESC boot and fins straight
     actuatorNode.setMotor(0);
     ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
         actuatorNode.setFin(fin as Fin, 0);
     })
 
-    actuatorNode.pwm.channelOn(0);
     // Log all I2C registers after initialization
     await actuatorNode.logI2CRegisters();
+
     while(true){
       await actuatorNode.finTest();
     }
@@ -74,19 +72,43 @@ class ActuatorNode {
   
   async logI2CRegisters() {
     console.log('Logging I2C registers for device at 0x40:');
-    for (let register = 0; register <= 0x45; register++) {
+    console.log('Channel | ON time | OFF time | Duty Cycle');
+    console.log('--------|---------|----------|------------');
+
+    for (let channel = 0; channel < 16; channel++) {
+      const baseRegister = 0x06 + (channel * 4);
       try {
-        const value = await new Promise<number>((resolve, reject) => {
-          this.i2c.readByte(0x40, register, (err, byte) => {
-            if (err) reject(err);
-            else resolve(byte);
-          });
-        });
-        console.log(`Register 0x${register.toString(16).padStart(2, '0')}: 0x${value.toString(16).padStart(2, '0')}`);
+        const onLow = await this.readRegister(baseRegister);
+        const onHigh = await this.readRegister(baseRegister + 1);
+        const offLow = await this.readRegister(baseRegister + 2);
+        const offHigh = await this.readRegister(baseRegister + 3);
+
+        const onTime = (onHigh << 8) | onLow;
+        const offTime = (offHigh << 8) | offLow;
+
+        let dutyCycle: number | string;
+        if (onTime === 4096) {
+          dutyCycle = "100%";
+        } else if (offTime === 4096) {
+          dutyCycle = "0%";
+        } else {
+          dutyCycle = ((offTime - onTime) / 4096 * 100).toFixed(2) + "%";
+        }
+
+        console.log(`${channel.toString().padStart(7)} | ${onTime.toString().padStart(7)} | ${offTime.toString().padStart(8)} | ${dutyCycle.toString().padStart(10)}`);
       } catch (error) {
-        console.error(`Error reading register 0x${register.toString(16).padStart(2, '0')}:`, error);
+        console.error(`Error reading registers for channel ${channel}:`, error);
       }
     }
+  }
+
+  private async readRegister(register: number): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      this.i2c.readByte(0x40, register, (err, byte) => {
+        if (err) reject(err);
+        else resolve(byte);
+      });
+    });
   }
 
   setFin(fin: Fin, angle: number) {
