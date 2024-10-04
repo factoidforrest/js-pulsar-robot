@@ -56,8 +56,7 @@ class ActuatorNode {
         });
     });
 
-    // Log all I2C registers after initialization
-    await actuatorNode.logI2CRegisters();
+
 
     // zero everything out to start. Should make ESC boot and fins straight
     actuatorNode.setMotor(0);
@@ -65,6 +64,9 @@ class ActuatorNode {
         actuatorNode.setFin(fin as Fin, 0);
     })
 
+    actuatorNode.pwm.channelOn(0);
+    // Log all I2C registers after initialization
+    await actuatorNode.logI2CRegisters();
     while(true){
       await actuatorNode.finTest();
     }
