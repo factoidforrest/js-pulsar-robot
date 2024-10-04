@@ -51,6 +51,7 @@ class ActuatorNode {
             if (err) {
                 reject(err);
             } else {
+              console.log('initialized PWM board')
                 resolve(pwm);
             }
         });
