@@ -4,10 +4,10 @@ import { actuatorCommand } from '../../topics/generated/topics/topics.js';
 import { Pca9685Driver, Pca9685Options } from 'pca9685';
 
 const chan = {
-    portStab: 0,
-    topRud: 1,
-    starbStab: 2,
-    bottomRud: 3,
+    portStab: 12,
+    topRud: 13,
+    starbStab: 14,
+    bottomRud: 15,
     motor: 4
 }
 
