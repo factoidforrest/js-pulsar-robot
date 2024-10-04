@@ -42,7 +42,7 @@ class ActuatorNode {
       i2c: actuatorNode.i2c,
       address: 0x40,
       frequency: 50, //todo: Change to 100, just it was 50 by default so make sure it works first
-      debug: false,
+      debug: true,
     };
 
     // promisify the creation of this slightly clunky i2c lib
