@@ -40,7 +40,7 @@ class ActuatorNode {
 
     const driverOptions: Pca9685Options = {
       i2c: actuatorNode.i2c,
-      address: 0x40,
+      address: 0x70,
       frequency: 50, //todo: Change to 100, just it was 50 by default so make sure it works first
       debug: true,
     };
