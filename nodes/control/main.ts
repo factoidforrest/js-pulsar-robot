@@ -144,7 +144,7 @@ class ActuatorNode {
           this.setFin(fin as Fin, i);
       })
       this.logI2CRegisters();
-      await sleep(10);
+      await sleep(1000);
     }
   }
 
