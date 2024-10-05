@@ -65,14 +65,14 @@ class ActuatorNode {
     // Log all I2C registers after initialization
     await actuatorNode.logI2CRegisters();
 
-    // while(true){
-    //   await actuatorNode.finTest();
-    // }
-    console.log('setting pin 12 to 1500')
+    while(true){
+      await actuatorNode.finTest();
+    }
+    // console.log('setting pin 12 to 1500')
 
-    actuatorNode.pwm.setPulseLength(12, 1500);
+    // actuatorNode.pwm.setPulseLength(12, 1500);
 
-    await actuatorNode.logI2CRegisters();
+    // await actuatorNode.logI2CRegisters();
 
   }
   
@@ -120,10 +120,11 @@ class ActuatorNode {
   setFin(fin: Fin, angle: number) {
     // Limit the angle to ±40 degrees
     angle = Math.max(-40, Math.min(40, angle));
-    // do the math to convert a servo that is at a zero degree angle in the middle of its duty cycle, so "50" to an angle. So if the angle is negative, it will be below 50, and positive, above 50. assume 180 degree servoes
-    const dutyCycle = 50 + (angle / 180) * 50;
+    //calculate 1000-2000 pulse length 1000 is 0 degrees, 2000 is 180 degrees
+    const pulse = 1500 + (angle / 40) * 500;
+    // const dutyCycle = 50 + (angle / 180) * 50;
     const channel = chan[fin];
-    this.pwm.setDutyCycle(channel, dutyCycle);
+    this.pwm.setPulseLength(channel, pulse);
   }
 
   setMotor(speed: number) {
@@ -131,6 +132,8 @@ class ActuatorNode {
   }
 
   calculateFinAngles(yaw: number, pitch: number, roll: number): { [key in Exclude<keyof typeof chan, 'motor'>]: number } {
+    // todo: we should limit pitch and yaw by the amount of roll needed so that we dont lose half of roll authority by maxing out the 40 degree limit
+  
     return {
       portStab: pitch - roll,
       topRud: yaw - roll,
