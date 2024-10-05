@@ -65,9 +65,15 @@ class ActuatorNode {
     // Log all I2C registers after initialization
     await actuatorNode.logI2CRegisters();
 
-    while(true){
-      await actuatorNode.finTest();
-    }
+    // while(true){
+    //   await actuatorNode.finTest();
+    // }
+    console.log('setting pin 12 to 1500')
+
+    actuatorNode.pwm.setPulseLength(12, 1500);
+
+    await actuatorNode.logI2CRegisters();
+
   }
   
   async logI2CRegisters() {
