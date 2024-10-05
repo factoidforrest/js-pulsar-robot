@@ -21,31 +21,31 @@ class ActuatorNode {
   private constructor() {}
 
   static async initialize() {
-    const actuatorNode = new ActuatorNode();
+    const self = new ActuatorNode();
     console.log('initializing actuator node');
-    actuatorNode.node = await Node.create({
+    self.node = await Node.create({
       name: 'actuator-node',
     });
 
-    actuatorNode.actuatorTopic = actuatorNode.node.createTopicSubscriber(
+    self.actuatorTopic = self.node.createTopicSubscriber(
       'auv.control.actuators',
       actuatorCommand
     );
 
-    actuatorNode.actuatorTopic.on('message', actuatorNode.handleMessage.bind(actuatorNode));
-    actuatorNode.actuatorTopic.on('error', actuatorNode.handleError.bind(actuatorNode));
+    self.actuatorTopic.on('message', self.handleMessage.bind(self));
+    self.actuatorTopic.on('error', self.handleError.bind(self));
 
-    actuatorNode.i2c = i2cBus.openSync(1);
+    self.i2c = i2cBus.openSync(1);
 
     const driverOptions: Pca9685Options = {
-      i2c: actuatorNode.i2c,
+      i2c: self.i2c,
       address: 0x40,
       frequency: 50, 
       debug: true,
     };
 
     // promisify the creation of this slightly clunky i2c lib
-    actuatorNode.pwm = await new Promise((resolve, reject) => {
+    self.pwm = await new Promise((resolve, reject) => {
         const pwm = new Pca9685Driver(driverOptions,(err) => {
             if (err) {
                 reject(err);
@@ -57,23 +57,28 @@ class ActuatorNode {
     });
 
     // zero everything out to start. Should make ESC boot and fins straight
-    actuatorNode.setMotor(0);
-    ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
-        actuatorNode.setFin(fin as Fin, 0);
-    })
 
+    
     // Log all I2C registers after initialization
-    await actuatorNode.logI2CRegisters();
+    await self.logI2CRegisters();
 
-    while(true){
-      await actuatorNode.finTest();
-    }
+    await self.finTest();
+
+    self.zeroEverything();
+    
     // console.log('setting pin 12 to 1500')
 
     // actuatorNode.pwm.setPulseLength(12, 1500);
 
     // await actuatorNode.logI2CRegisters();
 
+  }
+
+  zeroEverything() {
+    this.setMotor(0);
+    ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
+        this.setFin(fin as Fin, 0);
+    })
   }
   
   async logI2CRegisters() {
@@ -121,10 +126,10 @@ class ActuatorNode {
     // Limit the angle to ±40 degrees
     angle = Math.max(-40, Math.min(40, angle));
     //calculate 1000-2000 pulse length 1000 is 0 degrees, 2000 is 180 degrees
-    const pulse = 1620 + (angle / 90) * 500;
+    const pulse = 1500 + (angle / 90) * 500;
     // const dutyCycle = 50 + (angle / 180) * 50;
     const channel = chan[fin];
-    this.pwm.setPulseLength(channel, 3000);
+    this.pwm.setPulseLength(channel, pulse);
     console.log('SET FIN TO ', pulse);
   }
 
