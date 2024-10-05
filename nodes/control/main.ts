@@ -159,14 +159,14 @@ class ActuatorNode {
           this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
-      await sleep(50);
+      await sleep(10);
     }
     for (let i = 40; i >= -40; i--) {
       ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
         this.setFin(fin as Fin, i);
-    })
-    // this.logI2CRegisters();
-    await sleep(50);
+      })
+      // this.logI2CRegisters();
+      await sleep(50);
   }
   
   }
