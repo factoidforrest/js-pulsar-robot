@@ -171,7 +171,7 @@ class ActuatorNode {
     }
 
     this.zeroEverything();
-    sleep(2000)
+    await sleep(2000)
   
   }
 
