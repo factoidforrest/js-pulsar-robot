@@ -155,7 +155,7 @@ class ActuatorNode {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    for (let i = -40; i <= 40; i++) {
+    for (let i = -40; i <= 40; i = i + 0.1) {
         ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
           this.setFin(fin as Fin, i);
       })
