@@ -125,7 +125,7 @@ class ActuatorNode {
 
   setFin(fin: Fin, angle: number) {
     // Limit the angle to ±40 degrees
-    angle = Math.max(-40, Math.min(40, angle));
+    angle = Math.max(-70, Math.min(70, angle));
     //calculate 1000-2000 pulse length 1000 is 0 degrees, 2000 is 180 degrees
     const pulse = 1500 + (angle / 90) * 500;
     // const dutyCycle = 50 + (angle / 180) * 50;
@@ -155,14 +155,14 @@ class ActuatorNode {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    for (let i = -40; i <= 40; i++) {
+    for (let i = -70; i <= 70; i++) {
         ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
           this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
       await sleep(20);
     }
-    for (let i = 40; i >= -40; i--) {
+    for (let i = 70; i >= -70; i--) {
       ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
         this.setFin(fin as Fin, i);
       })
