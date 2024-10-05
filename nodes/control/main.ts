@@ -65,9 +65,9 @@ class ActuatorNode {
     // Log all I2C registers after initialization
     await actuatorNode.logI2CRegisters();
 
-    // while(true){
-    //   await actuatorNode.finTest();
-    // }
+    while(true){
+      await actuatorNode.finTest();
+    }
     // console.log('setting pin 12 to 1500')
 
     // actuatorNode.pwm.setPulseLength(12, 1500);
@@ -155,6 +155,14 @@ class ActuatorNode {
       // this.logI2CRegisters();
       await sleep(50);
     }
+    for (let i = 40; i >= -40; i--) {
+      ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
+        this.setFin(fin as Fin, i);
+    })
+    // this.logI2CRegisters();
+    await sleep(50);
+  }
+  
   }
 
   private handleMessage(message: actuatorCommand) {
