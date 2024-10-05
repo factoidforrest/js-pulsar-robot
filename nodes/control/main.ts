@@ -124,7 +124,7 @@ class ActuatorNode {
     const pulse = 1620 + (angle / 90) * 500;
     // const dutyCycle = 50 + (angle / 180) * 50;
     const channel = chan[fin];
-    this.pwm.setPulseLength(channel, 2000);
+    this.pwm.setPulseLength(channel, 3000);
     console.log('SET FIN TO ', pulse);
   }
 
