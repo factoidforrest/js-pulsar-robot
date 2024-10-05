@@ -61,10 +61,11 @@ class ActuatorNode {
     
     // Log all I2C registers after initialization
     await self.logI2CRegisters();
+    while (true){
+      await self.finTest();
+    }
 
-    await self.finTest();
-
-    self.zeroEverything();
+    // self.zeroEverything();
     
     // console.log('setting pin 12 to 1500')
 
@@ -159,15 +160,18 @@ class ActuatorNode {
           this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
-      await sleep(10);
+      await sleep(20);
     }
     for (let i = 40; i >= -40; i--) {
       ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
         this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
-      await sleep(50);
-  }
+      await sleep(20);
+    }
+
+    this.zeroEverything();
+    sleep(2000)
   
   }
 
