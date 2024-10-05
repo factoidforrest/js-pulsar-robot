@@ -127,7 +127,7 @@ class ActuatorNode {
     // Limit the angle to ±40 degrees
     angle = Math.max(-40, Math.min(40, angle));
     //calculate 1000-2000 pulse length 1000 is 0 degrees, 2000 is 180 degrees
-    const pulse = 1500 + (angle / 90) * 1000;
+    const pulse = 1500 + (angle / 90) * 850;
     // const dutyCycle = 50 + (angle / 180) * 50;
     const channel = chan[fin];
     this.pwm.setPulseLength(channel, pulse);
