@@ -8,7 +8,7 @@ const chan = {
     topRud: 13,
     starbStab: 14,
     bottomRud: 15,
-    motor: 4
+    motor: 0
 }
 
 type Fin = Exclude<keyof typeof chan, 'motor'>
@@ -60,18 +60,21 @@ class ActuatorNode {
 
     
     // Log all I2C registers after initialization
-    await self.logI2CRegisters();
-    while (true){
-      await self.finTest();
-    }
+    // await self.logI2CRegisters();
+    await self.finTest();
+    
 
-    // self.zeroEverything();
+    self.zeroEverything();
     
     // console.log('setting pin 12 to 1500')
 
     // actuatorNode.pwm.setPulseLength(12, 1500);
 
     // await actuatorNode.logI2CRegisters();
+    setTimeout(() => {
+      self.setMotor(20);
+    }, 4000)
+    await self.logI2CRegisters();
 
   }
 
@@ -81,6 +84,7 @@ class ActuatorNode {
         this.setFin(fin as Fin, 0);
     })
   }
+
   
   async logI2CRegisters() {
     console.log('Logging I2C registers for device at 0x40:');
@@ -124,6 +128,10 @@ class ActuatorNode {
   }
 
   setFin(fin: Fin, angle: number) {
+    // reverse the fins with backwards throw
+    if (['topRud', 'starbStab'].includes(fin)){
+      angle = -angle;
+    }
     // Limit the angle to ±40 degrees
     angle = Math.max(-40, Math.min(40, angle));
     //calculate 1000-2000 pulse length 1000 is 0 degrees, 2000 is 180 degrees
@@ -131,11 +139,13 @@ class ActuatorNode {
     // const dutyCycle = 50 + (angle / 180) * 50;
     const channel = chan[fin];
     this.pwm.setPulseLength(channel, pulse);
-    console.log('SET FIN TO ', pulse);
   }
 
   setMotor(speed: number) {
-    this.pwm.setDutyCycle(chan.motor, speed);
+    // speed from 0 to 100
+    // todo: change this to pulse length
+    const pulse = 1000 + (speed / 100) * 1000;
+    this.pwm.setPulseLength(chan.motor, pulse);
   }
 
   calculateFinAngles(yaw: number, pitch: number, roll: number): { [key in Exclude<keyof typeof chan, 'motor'>]: number } {
@@ -155,7 +165,7 @@ class ActuatorNode {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    for (let i = -40; i <= 40; i = i + 0.1) {
+    for (let i = -40; i <= 40; i = i + 0.5) {
         ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
           this.setFin(fin as Fin, i);
       })
@@ -170,9 +180,7 @@ class ActuatorNode {
       await sleep(20);
     }
 
-    this.zeroEverything();
-    await sleep(2000)
-  
+    this.zeroEverything();  
   }
 
   private handleMessage(message: actuatorCommand) {

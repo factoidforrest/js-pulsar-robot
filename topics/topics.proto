@@ -94,22 +94,22 @@ message targetPose {
 
 // New messages for navigation and mission planning
 
-message Waypoint {
+message waypoint {
   double latitude = 1;
   double longitude = 2;
-  double depth = 3;    // Depth for underwater navigation
-  double speed = 5;    // Desired speed to approach this waypoint
+  double depth = 3; // Depth for underwater navigation
+  double speed = 5; // Desired speed to approach this waypoint
   string uuid = 6;
 }
 
-message Mission {
+message mission {
   double max_duration = 1; // Maximum mission duration in seconds
-  repeated Waypoint waypoints = 2;
+  repeated waypoint waypoints = 2;
   double default_speed = 3; // Default speed for the mission
   double max_depth = 4;     // Maximum allowed depth for the mission
 }
 
-message MissionStatus {
+message missionStatus {
   string mission_id = 1;
   enum Status {
     PENDING = 0;
@@ -124,4 +124,9 @@ message MissionStatus {
   repeated string completed_actions = 6;
   string last_error = 7;
   double estimated_time_remaining = 8;
+}
+
+message setNavigationMode {
+  // mode can be "manual, "attitude","waypoint"
+  string mode = 1;
 }

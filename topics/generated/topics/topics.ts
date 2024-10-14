@@ -110,6 +110,88 @@ export interface targetPose {
   qz: number;
 }
 
+export interface waypoint {
+  latitude: number;
+  longitude: number;
+  /** Depth for underwater navigation */
+  depth: number;
+  /** Desired speed to approach this waypoint */
+  speed: number;
+  uuid: string;
+}
+
+export interface mission {
+  /** Maximum mission duration in seconds */
+  maxDuration: number;
+  waypoints: waypoint[];
+  /** Default speed for the mission */
+  defaultSpeed: number;
+  /** Maximum allowed depth for the mission */
+  maxDepth: number;
+}
+
+export interface missionStatus {
+  missionId: string;
+  status: missionStatus_Status;
+  currentWaypointIndex: number;
+  /** Progress as a percentage (0-100) */
+  missionProgress: number;
+  currentAction: string;
+  completedActions: string[];
+  lastError: string;
+  estimatedTimeRemaining: number;
+}
+
+export enum missionStatus_Status {
+  PENDING = 0,
+  IN_PROGRESS = 1,
+  COMPLETED = 2,
+  ABORTED = 3,
+  UNRECOGNIZED = -1,
+}
+
+export function missionStatus_StatusFromJSON(object: any): missionStatus_Status {
+  switch (object) {
+    case 0:
+    case "PENDING":
+      return missionStatus_Status.PENDING;
+    case 1:
+    case "IN_PROGRESS":
+      return missionStatus_Status.IN_PROGRESS;
+    case 2:
+    case "COMPLETED":
+      return missionStatus_Status.COMPLETED;
+    case 3:
+    case "ABORTED":
+      return missionStatus_Status.ABORTED;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return missionStatus_Status.UNRECOGNIZED;
+  }
+}
+
+export function missionStatus_StatusToJSON(object: missionStatus_Status): string {
+  switch (object) {
+    case missionStatus_Status.PENDING:
+      return "PENDING";
+    case missionStatus_Status.IN_PROGRESS:
+      return "IN_PROGRESS";
+    case missionStatus_Status.COMPLETED:
+      return "COMPLETED";
+    case missionStatus_Status.ABORTED:
+      return "ABORTED";
+    case missionStatus_Status.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
+export interface setNavigationMode {
+  /** mode can be "manual, "attitude","waypoint" */
+  mode: string;
+}
+
 function createBasehelloWorld(): helloWorld {
   return { message: "" };
 }
@@ -1597,6 +1679,465 @@ export const targetPose: MessageFns<targetPose> = {
     message.qx = object.qx ?? 0;
     message.qy = object.qy ?? 0;
     message.qz = object.qz ?? 0;
+    return message;
+  },
+};
+
+function createBasewaypoint(): waypoint {
+  return { latitude: 0, longitude: 0, depth: 0, speed: 0, uuid: "" };
+}
+
+export const waypoint: MessageFns<waypoint> = {
+  encode(message: waypoint, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.latitude !== 0) {
+      writer.uint32(9).double(message.latitude);
+    }
+    if (message.longitude !== 0) {
+      writer.uint32(17).double(message.longitude);
+    }
+    if (message.depth !== 0) {
+      writer.uint32(25).double(message.depth);
+    }
+    if (message.speed !== 0) {
+      writer.uint32(41).double(message.speed);
+    }
+    if (message.uuid !== "") {
+      writer.uint32(50).string(message.uuid);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): waypoint {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasewaypoint();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.latitude = reader.double();
+          continue;
+        case 2:
+          if (tag !== 17) {
+            break;
+          }
+
+          message.longitude = reader.double();
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.depth = reader.double();
+          continue;
+        case 5:
+          if (tag !== 41) {
+            break;
+          }
+
+          message.speed = reader.double();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.uuid = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): waypoint {
+    return {
+      latitude: isSet(object.latitude) ? globalThis.Number(object.latitude) : 0,
+      longitude: isSet(object.longitude) ? globalThis.Number(object.longitude) : 0,
+      depth: isSet(object.depth) ? globalThis.Number(object.depth) : 0,
+      speed: isSet(object.speed) ? globalThis.Number(object.speed) : 0,
+      uuid: isSet(object.uuid) ? globalThis.String(object.uuid) : "",
+    };
+  },
+
+  toJSON(message: waypoint): unknown {
+    const obj: any = {};
+    if (message.latitude !== 0) {
+      obj.latitude = message.latitude;
+    }
+    if (message.longitude !== 0) {
+      obj.longitude = message.longitude;
+    }
+    if (message.depth !== 0) {
+      obj.depth = message.depth;
+    }
+    if (message.speed !== 0) {
+      obj.speed = message.speed;
+    }
+    if (message.uuid !== "") {
+      obj.uuid = message.uuid;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<waypoint>, I>>(base?: I): waypoint {
+    return waypoint.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<waypoint>, I>>(object: I): waypoint {
+    const message = createBasewaypoint();
+    message.latitude = object.latitude ?? 0;
+    message.longitude = object.longitude ?? 0;
+    message.depth = object.depth ?? 0;
+    message.speed = object.speed ?? 0;
+    message.uuid = object.uuid ?? "";
+    return message;
+  },
+};
+
+function createBasemission(): mission {
+  return { maxDuration: 0, waypoints: [], defaultSpeed: 0, maxDepth: 0 };
+}
+
+export const mission: MessageFns<mission> = {
+  encode(message: mission, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.maxDuration !== 0) {
+      writer.uint32(9).double(message.maxDuration);
+    }
+    for (const v of message.waypoints) {
+      waypoint.encode(v!, writer.uint32(18).fork()).join();
+    }
+    if (message.defaultSpeed !== 0) {
+      writer.uint32(25).double(message.defaultSpeed);
+    }
+    if (message.maxDepth !== 0) {
+      writer.uint32(33).double(message.maxDepth);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): mission {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasemission();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 9) {
+            break;
+          }
+
+          message.maxDuration = reader.double();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.waypoints.push(waypoint.decode(reader, reader.uint32()));
+          continue;
+        case 3:
+          if (tag !== 25) {
+            break;
+          }
+
+          message.defaultSpeed = reader.double();
+          continue;
+        case 4:
+          if (tag !== 33) {
+            break;
+          }
+
+          message.maxDepth = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): mission {
+    return {
+      maxDuration: isSet(object.maxDuration) ? globalThis.Number(object.maxDuration) : 0,
+      waypoints: globalThis.Array.isArray(object?.waypoints)
+        ? object.waypoints.map((e: any) => waypoint.fromJSON(e))
+        : [],
+      defaultSpeed: isSet(object.defaultSpeed) ? globalThis.Number(object.defaultSpeed) : 0,
+      maxDepth: isSet(object.maxDepth) ? globalThis.Number(object.maxDepth) : 0,
+    };
+  },
+
+  toJSON(message: mission): unknown {
+    const obj: any = {};
+    if (message.maxDuration !== 0) {
+      obj.maxDuration = message.maxDuration;
+    }
+    if (message.waypoints?.length) {
+      obj.waypoints = message.waypoints.map((e) => waypoint.toJSON(e));
+    }
+    if (message.defaultSpeed !== 0) {
+      obj.defaultSpeed = message.defaultSpeed;
+    }
+    if (message.maxDepth !== 0) {
+      obj.maxDepth = message.maxDepth;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<mission>, I>>(base?: I): mission {
+    return mission.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<mission>, I>>(object: I): mission {
+    const message = createBasemission();
+    message.maxDuration = object.maxDuration ?? 0;
+    message.waypoints = object.waypoints?.map((e) => waypoint.fromPartial(e)) || [];
+    message.defaultSpeed = object.defaultSpeed ?? 0;
+    message.maxDepth = object.maxDepth ?? 0;
+    return message;
+  },
+};
+
+function createBasemissionStatus(): missionStatus {
+  return {
+    missionId: "",
+    status: 0,
+    currentWaypointIndex: 0,
+    missionProgress: 0,
+    currentAction: "",
+    completedActions: [],
+    lastError: "",
+    estimatedTimeRemaining: 0,
+  };
+}
+
+export const missionStatus: MessageFns<missionStatus> = {
+  encode(message: missionStatus, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.missionId !== "") {
+      writer.uint32(10).string(message.missionId);
+    }
+    if (message.status !== 0) {
+      writer.uint32(16).int32(message.status);
+    }
+    if (message.currentWaypointIndex !== 0) {
+      writer.uint32(24).int32(message.currentWaypointIndex);
+    }
+    if (message.missionProgress !== 0) {
+      writer.uint32(33).double(message.missionProgress);
+    }
+    if (message.currentAction !== "") {
+      writer.uint32(42).string(message.currentAction);
+    }
+    for (const v of message.completedActions) {
+      writer.uint32(50).string(v!);
+    }
+    if (message.lastError !== "") {
+      writer.uint32(58).string(message.lastError);
+    }
+    if (message.estimatedTimeRemaining !== 0) {
+      writer.uint32(65).double(message.estimatedTimeRemaining);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): missionStatus {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasemissionStatus();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.missionId = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.status = reader.int32() as any;
+          continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.currentWaypointIndex = reader.int32();
+          continue;
+        case 4:
+          if (tag !== 33) {
+            break;
+          }
+
+          message.missionProgress = reader.double();
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.currentAction = reader.string();
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.completedActions.push(reader.string());
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.lastError = reader.string();
+          continue;
+        case 8:
+          if (tag !== 65) {
+            break;
+          }
+
+          message.estimatedTimeRemaining = reader.double();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): missionStatus {
+    return {
+      missionId: isSet(object.missionId) ? globalThis.String(object.missionId) : "",
+      status: isSet(object.status) ? missionStatus_StatusFromJSON(object.status) : 0,
+      currentWaypointIndex: isSet(object.currentWaypointIndex) ? globalThis.Number(object.currentWaypointIndex) : 0,
+      missionProgress: isSet(object.missionProgress) ? globalThis.Number(object.missionProgress) : 0,
+      currentAction: isSet(object.currentAction) ? globalThis.String(object.currentAction) : "",
+      completedActions: globalThis.Array.isArray(object?.completedActions)
+        ? object.completedActions.map((e: any) => globalThis.String(e))
+        : [],
+      lastError: isSet(object.lastError) ? globalThis.String(object.lastError) : "",
+      estimatedTimeRemaining: isSet(object.estimatedTimeRemaining)
+        ? globalThis.Number(object.estimatedTimeRemaining)
+        : 0,
+    };
+  },
+
+  toJSON(message: missionStatus): unknown {
+    const obj: any = {};
+    if (message.missionId !== "") {
+      obj.missionId = message.missionId;
+    }
+    if (message.status !== 0) {
+      obj.status = missionStatus_StatusToJSON(message.status);
+    }
+    if (message.currentWaypointIndex !== 0) {
+      obj.currentWaypointIndex = Math.round(message.currentWaypointIndex);
+    }
+    if (message.missionProgress !== 0) {
+      obj.missionProgress = message.missionProgress;
+    }
+    if (message.currentAction !== "") {
+      obj.currentAction = message.currentAction;
+    }
+    if (message.completedActions?.length) {
+      obj.completedActions = message.completedActions;
+    }
+    if (message.lastError !== "") {
+      obj.lastError = message.lastError;
+    }
+    if (message.estimatedTimeRemaining !== 0) {
+      obj.estimatedTimeRemaining = message.estimatedTimeRemaining;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<missionStatus>, I>>(base?: I): missionStatus {
+    return missionStatus.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<missionStatus>, I>>(object: I): missionStatus {
+    const message = createBasemissionStatus();
+    message.missionId = object.missionId ?? "";
+    message.status = object.status ?? 0;
+    message.currentWaypointIndex = object.currentWaypointIndex ?? 0;
+    message.missionProgress = object.missionProgress ?? 0;
+    message.currentAction = object.currentAction ?? "";
+    message.completedActions = object.completedActions?.map((e) => e) || [];
+    message.lastError = object.lastError ?? "";
+    message.estimatedTimeRemaining = object.estimatedTimeRemaining ?? 0;
+    return message;
+  },
+};
+
+function createBasesetNavigationMode(): setNavigationMode {
+  return { mode: "" };
+}
+
+export const setNavigationMode: MessageFns<setNavigationMode> = {
+  encode(message: setNavigationMode, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.mode !== "") {
+      writer.uint32(10).string(message.mode);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): setNavigationMode {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasesetNavigationMode();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.mode = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): setNavigationMode {
+    return { mode: isSet(object.mode) ? globalThis.String(object.mode) : "" };
+  },
+
+  toJSON(message: setNavigationMode): unknown {
+    const obj: any = {};
+    if (message.mode !== "") {
+      obj.mode = message.mode;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<setNavigationMode>, I>>(base?: I): setNavigationMode {
+    return setNavigationMode.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<setNavigationMode>, I>>(object: I): setNavigationMode {
+    const message = createBasesetNavigationMode();
+    message.mode = object.mode ?? "";
     return message;
   },
 };
