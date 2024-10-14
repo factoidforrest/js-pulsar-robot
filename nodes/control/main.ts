@@ -72,7 +72,7 @@ class ActuatorNode {
 
     // await actuatorNode.logI2CRegisters();
     setTimeout(() => {
-      self.setMotor(20);
+      self.setMotor(80);
     }, 4000)
     await self.logI2CRegisters();
 
@@ -170,14 +170,14 @@ class ActuatorNode {
           this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
-      await sleep(20);
+      await sleep(10);
     }
     for (let i = 40; i >= -40; i--) {
       ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
         this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
-      await sleep(20);
+      await sleep(10);
     }
 
     this.zeroEverything();  
