@@ -23,17 +23,6 @@ class ActuatorNode {
   static async initialize() {
     const self = new ActuatorNode();
     console.log('initializing actuator node');
-    self.node = await Node.create({
-      name: 'actuator-node',
-    });
-
-    self.actuatorTopic = self.node.createTopicSubscriber(
-      'auv.control.actuators',
-      actuatorCommand
-    );
-
-    self.actuatorTopic.on('message', self.handleMessage.bind(self));
-    self.actuatorTopic.on('error', self.handleError.bind(self));
 
     self.i2c = i2cBus.openSync(1);
 
@@ -41,7 +30,7 @@ class ActuatorNode {
       i2c: self.i2c,
       address: 0x40,
       frequency: 50, 
-      debug: true,
+      debug: false,
     };
 
     // promisify the creation of this slightly clunky i2c lib
@@ -58,23 +47,24 @@ class ActuatorNode {
 
     // zero everything out to start. Should make ESC boot and fins straight
 
-    
-    // Log all I2C registers after initialization
-    // await self.logI2CRegisters();
+    self.zeroEverything();
+
+
     await self.finTest();
     
+    // Now receive messages since the ESC should have booted after zeroing
+    self.node = await Node.create({
+      name: 'actuator-node',
+    });
 
-    self.zeroEverything();
-    
-    // console.log('setting pin 12 to 1500')
+    self.actuatorTopic = self.node.createTopicSubscriber(
+      'auv.control.actuators',
+      actuatorCommand
+    );
 
-    // actuatorNode.pwm.setPulseLength(12, 1500);
-
-    // await actuatorNode.logI2CRegisters();
-    setTimeout(() => {
-      self.setMotor(80);
-    }, 4000)
-    await self.logI2CRegisters();
+    self.actuatorTopic.on('message', self.handleMessage.bind(self));
+    self.actuatorTopic.on('error', self.handleError.bind(self));
+    self.setMotor(0);
 
   }
 
@@ -145,6 +135,7 @@ class ActuatorNode {
     // speed from 0 to 100
     // todo: change this to pulse length
     const pulse = 1000 + (speed / 100) * 1000;
+    console.log('set motor to pulse', pulse)
     this.pwm.setPulseLength(chan.motor, pulse);
   }
 
@@ -159,25 +150,27 @@ class ActuatorNode {
     };
   }
 
+  sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   async finTest() {
     console.log('testing fins')
-    function sleep(ms: number): Promise<void> {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+
 
     for (let i = -40; i <= 40; i = i + 0.5) {
         ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
           this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
-      await sleep(10);
+      await this.sleep(10);
     }
     for (let i = 40; i >= -40; i--) {
       ['portStab','topRud','starbStab','bottomRud'].forEach((fin) => {
         this.setFin(fin as Fin, i);
       })
       // this.logI2CRegisters();
-      await sleep(10);
+      await this.sleep(10);
     }
 
     this.zeroEverything();  

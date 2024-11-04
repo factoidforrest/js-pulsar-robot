@@ -26,7 +26,7 @@ class Autopilot {
     this.node = node;
 
     // Set up topic subscribers
-    this.missionTopic = this.node.createTopicSubscriber('auv.mission', mission);
+    this.missionTopic = this.node.createTopicSubscriber('auv.autopilot.mission', mission);
     this.setNavigationModeTopic = this.node.createTopicSubscriber('auv.navigation.mode', setNavigationMode);
     this.positionEstimateTopic = this.node.createTopicSubscriber('auv.navigation.position_estimate', positionEstimate);
 
@@ -131,7 +131,7 @@ class Autopilot {
 
     const dx = waypoint.longitude - this.currentPosition.global.longitude;
     const dy = waypoint.latitude - this.currentPosition.global.latitude;
-    const dz = waypoint.depth - (this.currentPosition.global as any).depth; // Assuming depth exists
+    const dz = waypoint.depth - this.currentPosition.global.depth; // Assuming depth exists
 
     // Calculate pitch and yaw angles
     const yaw = Math.atan2(dy, dx);
