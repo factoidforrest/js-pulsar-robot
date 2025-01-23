@@ -135,7 +135,6 @@ class ActuatorNode {
     // speed from 0 to 100
     // todo: change this to pulse length
     const pulse = 1000 + (speed / 100) * 1000;
-    console.log('set motor to pulse', pulse)
     this.pwm.setPulseLength(chan.motor, pulse);
   }
 

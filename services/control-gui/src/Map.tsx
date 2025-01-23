@@ -251,7 +251,3 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 //     }
 //   }
   
-  scene.camera.setView({
-    destination: new Cesium.Cartesian3(-3877002.181627189, 5147948.256341475, 864384.3423478723),
-    orientation: new Cesium.HeadingPitchRoll(5.914830423853524, -0.7139104486007932, 0.00017507632714419685),
-  });

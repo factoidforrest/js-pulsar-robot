@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { Viewer, Entity, CameraFlyTo , CesiumComponentRef} from 'resium';
-import { Cartesian3, Color, createWorldTerrainAsync, Ion , TerrainProvider, CesiumTerrainProvider, Viewer as CesiumViewer} from 'cesium';
+import { Viewer, Entity, CameraFlyTo , CesiumComponentRef, PointGraphics} from 'resium';
+import { Cartesian3, Color, createWorldTerrainAsync, Ion , TerrainProvider, CesiumTerrainProvider, Viewer as CesiumViewer, OpenStreetMapImageryProvider} from 'cesium';
 import * as Cesium from 'cesium';
 import 'cesium/Build/Cesium/Widgets/widgets.css'; // Import Cesium's default CSS
 
@@ -9,6 +9,10 @@ Ion.defaultAccessToken = import.meta.env.VITE_CESIUM_API_KEY as string;
 const App =   () => {
   // Coordinates for a 3D waypoint (example: New York City)
   const waypoint = Cartesian3.fromDegrees(-155, 19.89, 50000); // Longitude, Latitude, Altitude
+
+  const osmImageryProvider = new OpenStreetMapImageryProvider({
+    url: 'https://tile.openstreetmap.org/',
+  });
 
 
   const [bathymetry, setBathymetry] = useState<CesiumTerrainProvider>();
@@ -22,20 +26,22 @@ const App =   () => {
     fetchData();
   }, []); // Empty dependency array ensures it runs once after mount
 
-  const ref = useRef<CesiumComponentRef<CesiumViewer>>(null);
 
-  useEffect(() => {
-    console.log('useeffect cesium update thing called and ref is ', ref.current)
-    if (ref.current?.cesiumElement) {
+  const viewerRefCallback = (node: CesiumComponentRef<CesiumViewer>) => {
+    console.log('useeffect cesium update thing called and ref is ', node)
+    if (node?.cesiumElement) {
+      console.log("REF EXISTS NOW")
+
+
+      
       // console.log("CHANGING UP THE VIEWER REF")
       // // ref.current.cesiumElement is Cesium's Viewer
       // // DO SOMETHING
 
       
-      const viewer = ref.current.cesiumElement;
+      const viewer = node.cesiumElement;
+      const scene = viewer.scene;   
 
-
-      const scene = viewer.scene;
       const globe = scene.globe;
       const camera = scene.camera;
 
@@ -43,6 +49,26 @@ const App =   () => {
       globe.showGroundAtmosphere = false;
 
       globe.enableLighting = true;
+
+      // const imageryLayers = viewer.scene.imageryLayers;
+
+      // // Remove the default imagery layer
+      console.log('layers are!!!',scene.imageryLayers);
+  
+      // // Add the OpenStreetMap imagery provider
+      // imageryLayers.addImageryProvider(
+      //   createTile({
+      //     url: Cesium.buildModuleUrl('/node_modules/cesium/Build/Cesium/Assets/Textures/NaturalEarthII')
+      // }
+      // );
+
+      // baseLayer: Cesium.ImageryLayer.fromProviderAsync(
+      //   Cesium.TileMapServiceImageryProvider.fromUrl(
+      //     Cesium.buildModuleUrl("/node_modules/Assets/Textures/NaturalEarthII"),
+      //   ),
+      // ),
+
+    
 
       scene.light = new Cesium.DirectionalLight({
         direction: new Cesium.Cartesian3(1, 0, 0), // Updated every frame
@@ -162,6 +188,14 @@ const App =   () => {
 
        return ramp;
       }
+
+      scene.camera.setView({
+        destination: new Cesium.Cartesian3(-3877002.181627189, 5147948.256341475, 864384.3423478723),
+        orientation: new Cesium.HeadingPitchRoll(5.914830423853524, -0.7139104486007932, 0.00017507632714419685),
+      });
+
+
+
 
       // function getElevationContourMaterial() {
       // // Creates a composite material with both elevation shading and contour lines
@@ -314,8 +348,9 @@ const App =   () => {
       //   orientation: new Cesium.HeadingPitchRoll(5.914830423853524, -0.7139104486007932, 0.00017507632714419685),
       // });
     }
-  }, [ref.current]);
+  }
 
+  const newYorkPos = Cartesian3.fromDegrees(-74.0707383, 40.7117244, 100);
 
   if (!bathymetry){
     return <div>Loading...</div>
@@ -323,19 +358,39 @@ const App =   () => {
   return (
     
     <div style={{ height: '100vh', width: '100vw' }}>
-      <Viewer ref={ref}
-    
-      full
-      // terrainProvider={bathymetry} // Load Cesium World Terrain, includes bathymetry
-      terrainProvider={bathymetry}
-      timeline={false}
-      animation={false}
-      >
-        {/* Camera flies to the waypoint location on load */}
-        <CameraFlyTo
-          duration={1}
-          destination={waypoint}
-        />
+      <Viewer ref={viewerRefCallback}
+        full
+        // terrainProvider={bathymetry} // Load Cesium World Terrain, includes bathymetry
+        // imageryProvider={osmImageryProvider}
+        terrainProvider={bathymetry}
+        timeline={false}
+        animation={false}
+        
+        >
+          {/* Camera flies to the waypoint location on load */}
+          {/* <CameraFlyTo
+            duration={1}
+            destination={waypoint}
+          /> */}
+          <Entity
+            name="Bay Area"
+            position={Cesium.Cartesian3.fromDegrees(-122.4, 37.8, 500)} // San Francisco Bay area
+            point={{
+              pixelSize: 20,
+              color: Cesium.Color.PURPLE,
+              outlineColor: Cesium.Color.WHITE,
+              outlineWidth: 2,
+              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+              disableDepthTestDistance: Number.POSITIVE_INFINITY // Always render on top
+            }}
+            description="what the hell is this"
+          />
+          <Entity position={newYorkPos} name="Tokyo" description="Hello, world.">
+            <PointGraphics pixelSize={10} />
+          </Entity>
+
+
+
         
 
         {/* Entity for the 3D waypoint marker */}
