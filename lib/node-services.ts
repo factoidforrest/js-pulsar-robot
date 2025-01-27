@@ -1,16 +1,18 @@
 import EventEmitter from 'node:events';
-import * as Nats from 'nats';
 import {type MessageFns} from '../topics/generated/topics/topics.js';
+import type NatsT from '@nats-io/nats-core'
+const Nats = await (typeof window === 'undefined' ?  import('@nats-io/transport-node') : import('@nats-io/nats-core'))
 
 export type NodeConfig = {
 	natsServers?: string | string[];
+	useWebsockets?: boolean;
 	rate?: number;
 	name: string;
 	// Add other configuration options as needed
 };
 
 export class Node {
-	private client!: Nats.NatsConnection;
+	private client!: NatsT.NatsConnection;
 
 	constructor(public config: NodeConfig) {
 		// Initialization logic without async
@@ -24,7 +26,9 @@ export class Node {
 	}
 
 	async connect(): Promise<void> {
-		this.client = await Nats.connect({
+
+		const connector = this.config.useWebsockets ? Nats.wsconnect : Nats.connect;
+		this.client = await connector({
 			servers: this.config.natsServers || 'nats://localhost:4222',
 			// Additional client configuration
 		});
@@ -75,7 +79,7 @@ export class Node {
 
 export class TopicPublisher<T> {
 	constructor(
-		private readonly client: Nats.NatsConnection,
+		private readonly client: NatsT.NatsConnection,
 		private readonly serializer: MessageFns<T>,
 		private readonly topicName: string,
 		private readonly nodeName: string,
@@ -103,10 +107,10 @@ type TopicConsumerEvents<T> = {
 };
 
 export class TopicSubscriber<T> extends EventEmitter {
-	private readonly subscription: Nats.Subscription;
+	private readonly subscription: NatsT.Subscription;
 
 	constructor(
-		private readonly client: Nats.NatsConnection,
+		private readonly client: NatsT.NatsConnection,
 		private readonly serializer: MessageFns<T>,
 		private readonly topicName: string,
 		private readonly subscriptionName: string,
